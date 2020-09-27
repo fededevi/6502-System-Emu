@@ -5,6 +5,7 @@ HEADERS += \
 
 SOURCES += \
     cpu.cpp \
-    lda.cpp \
+    load.cpp \
     main.cpp \
-    memory.cpp
+    memory.cpp \
+    store.cpp

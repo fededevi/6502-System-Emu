@@ -1,11 +1,9 @@
 #include "cpu.h"
 
-#include "lda.cpp"
+#include "load.cpp"
+#include "store.cpp"
 
-CPU::CPU(Memory *_mem): mem(_mem){
-
-}
-
+CPU::CPU(Memory *_mem): mem(_mem){}
 
 void BRK(CPU *) {}
 
@@ -74,66 +72,59 @@ uint8_t CPU::pop() {
     SP++;
 }
 
-uint8_t CPU::immediate() {
-    CYCL;
-    return re(PC++);
+uint16_t CPU::immediate() {
+    return PC++;
 }
 
-uint8_t CPU::zeroPage() {
+uint16_t CPU::zeroPage() {
     CYCL;
     addr8 = re(PC++);
-    CYCL;
-    return re(addr8);
+    return addr8;
 }
 
-uint8_t CPU::zeroPageX() {
+uint16_t CPU::zeroPageX() {
     CYCL;
     addr16 = re(PC++);
     CYCL;
     addr16 += X;
-    CYCL;
-    return re(addr16);
+    return addr16;
 }
 
-uint8_t CPU::zeroPageY() {
+uint16_t CPU::zeroPageY() {
     CYCL;
     addr16 = re(PC++);
     CYCL;
     addr16 += Y;
-    CYCL;
-    return re(addr16);
+    return addr16;
 }
 
-uint8_t CPU::absolute() {
+uint16_t CPU::absolute() {
     CYCL;
     addr16 = re(PC++);
     CYCL;
     addr16 += re(PC++) >> 8;
-    CYCL;
-    return re(addr16);
+    return addr16;
 }
 
-uint8_t CPU::absoluteX() {
+uint16_t CPU::absoluteX() {
     CYCL;
     addr16 = re(PC++) + X;
     if (addr16 > 0xFF) CYCL;
     CYCL;
     addr16 += re(PC++) >> 8;
-    CYCL;
-    return re(addr16);
+    return addr16;
 }
 
-uint8_t CPU::absoluteY() {
+uint16_t CPU::absoluteY() {
     CYCL;
     addr16 = re(PC++) + X;
     if (addr16 > 0xFF) CYCL;
     CYCL;
     addr16 += re(PC++) >> 8;
-    CYCL;
-    return re(addr16);
+    return addr16;
 }
 
-uint8_t CPU::indirectX() {
+uint16_t CPU::indirectX() {
     CYCL;
     addr8 = re(PC++);
     CYCL;
@@ -142,11 +133,10 @@ uint8_t CPU::indirectX() {
     addr16 = re(addr8);
     CYCL;
     addr16 += re(addr8++) >> 8;
-    CYCL;
-    return re(addr16);
+    return addr16;
 }
 
-uint8_t CPU::indirectY() {
+uint16_t CPU::indirectY() {
     CYCL;
     addr16 = re(PC++) + X;
     if (addr16 > 0xFF) CYCL;
@@ -154,8 +144,7 @@ uint8_t CPU::indirectY() {
     addr16 += re(PC++) >> 8;
     CYCL;
     addr16 = re(addr16);
-    CYCL;
-    return re(addr16);
+    return addr16;
 }
 
 

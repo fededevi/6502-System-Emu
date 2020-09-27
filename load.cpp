@@ -6,42 +6,50 @@ void LDAFlags(CPU * cpu) {
 }
 
 void LDAI(CPU * cpu) {
-    cpu->A = cpu->immediate();
+    cpu->cycl();
+    cpu->A = cpu->mem->read(cpu->immediate());
     LDAFlags(cpu);
 }
 
 void LDAZ(CPU * cpu) {
-    cpu->A = cpu->zeroPage();
+    cpu->cycl();
+    cpu->A = cpu->mem->read(cpu->zeroPage());
     LDAFlags(cpu);
 }
 
 void LDAZX(CPU * cpu) {
-    cpu->A = cpu->zeroPageX();
+    cpu->cycl();
+    cpu->A = cpu->mem->read(cpu->zeroPageX());
     LDAFlags(cpu);
 }
 
 void LDAA(CPU * cpu) {
-    cpu->A = cpu->absolute();
+    cpu->cycl();
+    cpu->A = cpu->mem->read(cpu->absolute());
     LDAFlags(cpu);
 }
 
 void LDAAX(CPU * cpu) {
-    cpu->A = cpu->absoluteX();
+    cpu->cycl();
+    cpu->A = cpu->mem->read(cpu->absoluteX());
     LDAFlags(cpu);
 }
 
 void LDAAY(CPU * cpu) {
-    cpu->A = cpu->absoluteY();
+    cpu->cycl();
+    cpu->A = cpu->mem->read(cpu->absoluteY());
     LDAFlags(cpu);
 }
 
 void LDAIX(CPU * cpu) {
-    cpu->A = cpu->indirectX();
+    cpu->cycl();
+    cpu->A = cpu->mem->read(cpu->indirectX());
     LDAFlags(cpu);
 }
 
 void LDAIY(CPU * cpu) {
-    cpu->A = cpu->indirectY();
+    cpu->cycl();
+    cpu->A = cpu->mem->read(cpu->indirectY());
     LDAFlags(cpu);
 }
 
@@ -51,26 +59,31 @@ void LDXFlags(CPU * cpu) {
 }
 
 void LDXI(CPU * cpu) {
-    cpu->X = cpu->immediate();
+    cpu->cycl();
+    cpu->X = cpu->mem->read(cpu->immediate());
     LDXFlags(cpu);
 }
 
 void LDXZP(CPU * cpu) {
-    cpu->X = cpu->zeroPage();
+    cpu->cycl();
+    cpu->X = cpu->mem->read(cpu->zeroPage());
     LDXFlags(cpu);
 }
 
 void LDXZPY(CPU * cpu) {
-    cpu->X = cpu->zeroPageY();
+    cpu->cycl();
+    cpu->X = cpu->mem->read(cpu->zeroPageY());
     LDXFlags(cpu);
 }
 
 void LDXA(CPU * cpu) {
-    cpu->X = cpu->absolute();
+    cpu->cycl();
+    cpu->X = cpu->mem->read(cpu->absolute());
     LDXFlags(cpu);
 }
 
 void LDXAY(CPU * cpu) {
+    cpu->cycl();
     cpu->X = cpu->absoluteY();
     LDXFlags(cpu);
 }
@@ -81,26 +94,31 @@ void LDYFlags(CPU * cpu) {
 }
 
 void LDYI(CPU * cpu) {
-    cpu->Y = cpu->immediate();
+    cpu->cycl();
+    cpu->Y = cpu->mem->read(cpu->immediate());
     LDXFlags(cpu);
 }
 
 void LDYZP(CPU * cpu) {
-    cpu->Y = cpu->zeroPage();
+    cpu->cycl();
+    cpu->Y = cpu->mem->read(cpu->zeroPage());
     LDXFlags(cpu);
 }
 
 void LDYZPY(CPU * cpu) {
-    cpu->Y = cpu->zeroPageX();
+    cpu->cycl();
+    cpu->Y = cpu->mem->read(cpu->zeroPageX());
     LDXFlags(cpu);
 }
 
 void LDYA(CPU * cpu) {
-    cpu->Y = cpu->absolute();
+    cpu->cycl();
+    cpu->Y = cpu->mem->read(cpu->absolute());
     LDXFlags(cpu);
 }
 
 void LDYAY(CPU * cpu) {
-    cpu->Y = cpu->absoluteX();
+    cpu->cycl();
+    cpu->Y = cpu->mem->read(cpu->absoluteX());
     LDXFlags(cpu);
 }

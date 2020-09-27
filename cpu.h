@@ -35,15 +35,15 @@ public:
     void push(Byte);
     Byte pop();
 
-    Byte immediate();
-    Byte zeroPage();
-    Byte zeroPageX();
-    Byte zeroPageY();
-    Byte absolute();
-    Byte absoluteX();
-    Byte absoluteY();
-    Byte indirectX();
-    Byte indirectY();
+    Word immediate();
+    Word zeroPage();
+    Word zeroPageX();
+    Word zeroPageY();
+    Word absolute();
+    Word absoluteX();
+    Word absoluteY();
+    Word indirectX();
+    Word indirectY();
 };
 
 
