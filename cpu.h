@@ -24,12 +24,7 @@ public:
     Byte X;
     Byte Y;
 
-    Byte N;
-    Byte Z;
-    Byte C;
-    Byte I;
-    Byte D;
-    Byte V;
+    Byte P;
 
     void cycl() const;
     void push(Byte);
@@ -44,6 +39,14 @@ public:
     Word absoluteY();
     Word indirectX();
     Word indirectY();
+
+    void setN(bool);
+    void setV(bool);
+    void setB(bool);
+    void setD(bool);
+    void setI(bool);
+    void setZ(bool);
+    void setC(bool);
 };
 
 

@@ -5,7 +5,13 @@
 
 CPU::CPU(Memory *_mem): mem(_mem){}
 
-void BRK(CPU *) {}
+void BRK(CPU * cpu) {
+    cpu->push(cpu->PC >> 8);
+    cpu->push(cpu->PC);
+    cpu->push(cpu->P);
+    cpu->PC = cpu->mem->read16(0XFFFE);
+    cpu->setB(true);
+}
 
 
 #define re mem->read
@@ -43,12 +49,7 @@ void CPU::reset()
     X = 0X0;
     Y = 0X0;
 
-    N = 0X0;
-    Z = 0X0;
-    C = 0X0;
-    I = 0X0;
-    D = 0X0;
-    V = 0X0;
+    P = 0X0;
 }
 
 void CPU::execute()
@@ -71,6 +72,7 @@ uint8_t CPU::pop() {
     return mem->read(0x100+SP);
     SP++;
 }
+
 
 Word CPU::immediate() {
     return PC++;
@@ -145,6 +147,49 @@ Word CPU::indirectY() {
     CYCL;
     addr16 = re(addr16);
     return addr16;
+}
+
+void CPU::setN(bool f){
+    int pos = 0;
+    P  = P & ~(1 << pos);
+    P |= (f << pos);
+}
+
+void CPU::setV(bool f){
+    int pos = 1;
+    P  = P & ~(1 << pos);
+    P |= (f << pos);
+}
+
+void CPU::setB(bool f){
+    int pos = 3;
+    P  = P & ~(1 << pos);
+    P |= (f << pos);
+}
+
+void CPU::setD(bool f){
+    int pos = 4;
+    P  = P & ~(1 << pos);
+    P |= (f << pos);
+}
+
+void CPU::setI(bool f){
+    int pos = 5;
+    P  = P & ~(1 << pos);
+    P |= (f << pos);
+}
+
+void CPU::setZ(bool f){
+    int pos = 6;
+    P  = P & ~(1 << pos);
+    P |= (f << pos);
+}
+
+void CPU::setC(bool f){
+    int pos = 7;
+    P  = P & ~(1 << pos);
+    P |= (f << pos);
+
 }
 
 
