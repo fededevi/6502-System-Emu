@@ -8,8 +8,9 @@ class Memory
 public:
     Byte mem[65536];
 
-    Byte read( Byte addr) const;
-    void write( Byte addr, Byte value );
+    Byte read( Word addr) const;
+    Word read16( Word addr) const;
+    void write( Word addr, Byte value );
 };
 
 #endif // MEMORY_H

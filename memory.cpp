@@ -1,9 +1,15 @@
 #include "memory.h"
 
-uint8_t Memory::read(uint8_t addr) const {
+Byte Memory::read(Word addr) const {
     return mem[addr];
 }
 
-void Memory::write(uint8_t addr, uint8_t value) {
+Word Memory::read16(Word addr) const {
+    Word w;
+    w = read(addr) + (read(addr+1) << 8);
+    return w;
+}
+
+void Memory::write(Word addr, Byte value) {
     mem[addr] = value;
 }

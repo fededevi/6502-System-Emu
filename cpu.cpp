@@ -36,8 +36,8 @@ void (*functptr[256])(CPU *) = {
 
 void CPU::reset()
 {
-    PC = 0XFFFE;
-    SP = 0XFF;
+    PC = mem->read16(0XFFFC);
+    SP = 0XFD;
 
     A = 0X0;
     X = 0X0;
@@ -72,17 +72,17 @@ uint8_t CPU::pop() {
     SP++;
 }
 
-uint16_t CPU::immediate() {
+Word CPU::immediate() {
     return PC++;
 }
 
-uint16_t CPU::zeroPage() {
+Word CPU::zeroPage() {
     CYCL;
     addr8 = re(PC++);
     return addr8;
 }
 
-uint16_t CPU::zeroPageX() {
+Word CPU::zeroPageX() {
     CYCL;
     addr16 = re(PC++);
     CYCL;
@@ -90,7 +90,7 @@ uint16_t CPU::zeroPageX() {
     return addr16;
 }
 
-uint16_t CPU::zeroPageY() {
+Word CPU::zeroPageY() {
     CYCL;
     addr16 = re(PC++);
     CYCL;
@@ -98,7 +98,7 @@ uint16_t CPU::zeroPageY() {
     return addr16;
 }
 
-uint16_t CPU::absolute() {
+Word CPU::absolute() {
     CYCL;
     addr16 = re(PC++);
     CYCL;
@@ -106,7 +106,7 @@ uint16_t CPU::absolute() {
     return addr16;
 }
 
-uint16_t CPU::absoluteX() {
+Word CPU::absoluteX() {
     CYCL;
     addr16 = re(PC++) + X;
     if (addr16 > 0xFF) CYCL;
@@ -115,7 +115,7 @@ uint16_t CPU::absoluteX() {
     return addr16;
 }
 
-uint16_t CPU::absoluteY() {
+Word CPU::absoluteY() {
     CYCL;
     addr16 = re(PC++) + X;
     if (addr16 > 0xFF) CYCL;
@@ -124,7 +124,7 @@ uint16_t CPU::absoluteY() {
     return addr16;
 }
 
-uint16_t CPU::indirectX() {
+Word CPU::indirectX() {
     CYCL;
     addr8 = re(PC++);
     CYCL;
@@ -136,7 +136,7 @@ uint16_t CPU::indirectX() {
     return addr16;
 }
 
-uint16_t CPU::indirectY() {
+Word CPU::indirectY() {
     CYCL;
     addr16 = re(PC++) + X;
     if (addr16 > 0xFF) CYCL;
