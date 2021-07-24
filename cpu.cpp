@@ -2,6 +2,7 @@
 
 #include "load.cpp"
 #include "store.cpp"
+#include "addcarry.cpp"
 
 CPU::CPU(Memory *_mem): mem(_mem){}
 
@@ -27,8 +28,8 @@ void (*functptr[256])(CPU *) = {
         /*3*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
         /*4*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
         /*5*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
-        /*6*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
-        /*7*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
+        /*6*/       0,       ADCIX,  0,      0,      0,      ADCZ,   0,      0,      0,      ADCI,   0,      0,      0,      ADCA,   0,      0,
+        /*7*/       0,       ADCIY,  0,      0,      0,      ADCZX,  0,      0,      0,      ADCAY,  0,      0,      0,      ADCAX,  0,      0,
         /*8*/       0,       &STAIX, 0,      0,      &STYZP, &STAZ,  &STXZP, 0,      0,      0,      0,      0,      &STYA,  &STAA,  &STXA,  0,
         /*9*/       0,       &STAIY, 0,      0,      &STYZPX,&STAZX, &STXZPY,0,      0,      &STAAY, 0,      0,      0,      &STAAX, 0,      0,
         /*A*/       &LDYI,   &LDAIX, &LDXI,  0,      LDYZP,  &LDAZ,  &LDXZP, 0,      0,      &LDAI,  0,      0,      LDYA,   &LDAA,  &LDXA,  0,
@@ -184,6 +185,7 @@ void CPU::setZ(bool f){
     P  = P & ~(1 << pos);
     P |= (f << pos);
 }
+
 
 void CPU::setC(bool f){
     int pos = 7;

@@ -4,6 +4,7 @@ HEADERS += \
     types.h
 
 SOURCES += \
+    addcarry.cpp \
     cpu.cpp \
     load.cpp \
     main.cpp \
