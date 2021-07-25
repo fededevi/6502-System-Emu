@@ -1,16 +1,18 @@
-#ifndef MEMORY_H
-#define MEMORY_H
+#pragma once
+
+#define MEMORY_SIZE 65536
 
 #include "types.h"
 
 class Memory
 {
 public:
-    Byte mem[65536];
+    Memory();
+    static Memory randomMemory();
 
+public:
+    Byte mem[MEMORY_SIZE];
     Byte read( Word addr) const;
     Word read16( Word addr) const;
     void write( Word addr, Byte value );
 };
-
-#endif // MEMORY_H

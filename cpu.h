@@ -1,5 +1,4 @@
-#ifndef CPU_6502_H
-#define CPU_6502_H
+#pragma once
 
 #include "types.h"
 #include "memory.h"
@@ -26,14 +25,17 @@ public:
 
     Byte P;
 
-    void cycl() const;
+    void cycl();
     void push(Byte);
     Byte pop();
 
-    Word immediate();
-    Word zeroPage();
-    Word zeroPageX();
-    Word zeroPageY();
+    void pushPC();
+    Byte popPC();
+
+    Byte immediate();
+    Byte zeroPage();
+    Byte zeroPageX();
+    Byte zeroPageY();
     Word absolute();
     Word absoluteX();
     Word absoluteY();
@@ -54,7 +56,7 @@ public:
     Byte Z() { return (P & (1 << 6)) > 0; };
     void setC(bool);
     Byte C() { return (P & (1 << 7)) > 0; };
+
+    // Cycles
+    __int128 cycles = 0;
 };
-
-
-#endif // CPU_6502_H

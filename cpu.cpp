@@ -4,7 +4,9 @@
 #include "store.cpp"
 #include "addcarry.cpp"
 
-CPU::CPU(Memory *_mem): mem(_mem){}
+CPU::CPU(Memory *_mem): mem(_mem){
+
+}
 
 void BRK(CPU * cpu) {
     cpu->push(cpu->PC >> 8);
@@ -43,14 +45,24 @@ void (*functptr[256])(CPU *) = {
 
 void CPU::reset()
 {
-    PC = mem->read16(0XFFFC);
-    SP = 0XFD;
-
     A = 0X0;
     X = 0X0;
     Y = 0X0;
-
     P = 0X0;
+
+    SP = 0X0;
+    CYCL;
+    CYCL;
+    CYCL;
+    SP--;
+    CYCL;
+    SP--;
+    CYCL;
+    SP--;
+    CYCL;
+    PC = mem->read16(0XFFFC);
+    CYCL;
+
 }
 
 void CPU::execute()
@@ -59,9 +71,8 @@ void CPU::execute()
     functptr[instruction](this);
 }
 
-void CPU::cycl() const
-{
-
+void CPU::cycl() {
+    cycles++;
 }
 
 void CPU::push(uint8_t v) {
@@ -74,18 +85,26 @@ uint8_t CPU::pop() {
     SP++;
 }
 
+void CPU::pushPC() {
 
-Word CPU::immediate() {
+}
+
+uint8_t CPU::popPC() {
+
+}
+
+
+Byte CPU::immediate() {
     return PC++;
 }
 
-Word CPU::zeroPage() {
+Byte CPU::zeroPage() {
     CYCL;
     addr8 = re(PC++);
     return addr8;
 }
 
-Word CPU::zeroPageX() {
+Byte CPU::zeroPageX() {
     CYCL;
     addr16 = re(PC++);
     CYCL;
@@ -93,7 +112,7 @@ Word CPU::zeroPageX() {
     return addr16;
 }
 
-Word CPU::zeroPageY() {
+Byte CPU::zeroPageY() {
     CYCL;
     addr16 = re(PC++);
     CYCL;
@@ -102,11 +121,10 @@ Word CPU::zeroPageY() {
 }
 
 Word CPU::absolute() {
-    CYCL;
-    addr16 = re(PC++);
-    CYCL;
-    addr16 += re(PC++) >> 8;
-    return addr16;
+    Word addr = mem->read16(PC);
+    CYCL; PC++;
+    CYCL; PC++;
+    return addr;
 }
 
 Word CPU::absoluteX() {
