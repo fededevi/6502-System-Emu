@@ -28,6 +28,8 @@ set(TEST_HEADERS
 )
 
 # Create test executable
+# Note: Headers are included here so that CMake's AUTOMOC can process them
+# These headers contain Qt test classes with Q_OBJECT macros
 add_executable(6502_tests
     ${TEST_SOURCES}
     ${TEST_HEADERS}

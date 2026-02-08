@@ -29,7 +29,6 @@ set(EMULATOR_HEADERS
 # Create a library with the emulator code
 add_library(6502_emulator STATIC
     ${EMULATOR_SOURCES}
-    ${EMULATOR_HEADERS}
 )
 
 target_include_directories(6502_emulator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
