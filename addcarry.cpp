@@ -12,9 +12,10 @@ Word decimalSum(CPU * cpu, Word addr) {
 }
 
 void ADFlags(CPU * cpu, Word binary, Word decimal) {
+    Byte result = binary & 0xFF;
     cpu->setV((binary & 0x80) != (cpu->A & 0x80));
-    cpu->setZ(binary == 0);
-    cpu->setN((binary & 0x80) > 0);
+    cpu->setZ(result == 0);
+    cpu->setN((result & 0x80) > 0);
     cpu->setC(binary > 0XFF);
 
     if (cpu->D())
