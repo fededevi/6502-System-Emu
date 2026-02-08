@@ -207,7 +207,7 @@ private slots:
     void testLDYZeroPageX() {
         cpu.reset();
         cpu.X = 0x04;
-        mem.write(0x8000, 0xB4); // LDY Zero Page,X (LDYZPY - note: this is actually ZP,X)
+        mem.write(0x8000, 0xB4); // LDY Zero Page,X (note: function is named LDYZPY in source)
         mem.write(0x8001, 0x30);
         mem.write(0x0034, 0x77);
         cpu.execute();
@@ -227,7 +227,7 @@ private slots:
     void testLDYAbsoluteX() {
         cpu.reset();
         cpu.X = 0x05;
-        mem.write(0x8000, 0xBC); // LDY Absolute,X (LDYAY - note: this is actually ABS,X)
+        mem.write(0x8000, 0xBC); // LDY Absolute,X (note: function is named LDYAY in source)
         mem.write(0x8001, 0x00);
         mem.write(0x8002, 0x90);
         mem.write(0x9005, 0xBB);
