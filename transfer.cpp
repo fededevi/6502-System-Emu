@@ -41,4 +41,5 @@ void TSX(CPU * cpu) {
 void TXS(CPU * cpu) {
     CYCL
     cpu->SP = cpu->X;
+    // Note: TXS does not affect any flags (unlike other transfer instructions)
 }
