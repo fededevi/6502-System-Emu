@@ -22,17 +22,47 @@ public:
             return false;
         }
         
-        // Read file into memory
+        // Determine file size
         file.seekg(0, std::ios::end);
-        size_t size = file.tellg();
+        if (!file) {
+            std::cerr << "Error: Failed to seek to end of file " << filename << std::endl;
+            return false;
+        }
+
+        std::streampos endPos = file.tellg();
+        if (endPos < 0) {
+            std::cerr << "Error: Failed to determine size of file " << filename << std::endl;
+            return false;
+        }
+
+        size_t size = static_cast<size_t>(endPos);
         file.seekg(0, std::ios::beg);
-        
-        std::cout << "Loading " << filename << " (" << size << " bytes) at 0x" 
+        if (!file) {
+            std::cerr << "Error: Failed to seek to beginning of file " << filename << std::endl;
+            return false;
+        }
+
+        // Ensure the binary will fit into memory starting at startAddr
+        if (static_cast<size_t>(startAddr) + size > static_cast<size_t>(MEMORY_SIZE)) {
+            std::cerr << "Error: Binary " << filename << " (" << size
+                      << " bytes) does not fit in memory starting at 0x"
+                      << std::hex << startAddr << std::dec << std::endl;
+            return false;
+        }
+
+        std::cout << "Loading " << filename << " (" << size << " bytes) at 0x"
                   << std::hex << startAddr << std::dec << std::endl;
-        
+
         // Read into temporary buffer then write to memory
         std::vector<Byte> buffer(size);
-        file.read(reinterpret_cast<char*>(buffer.data()), size);
+        if (size > 0) {
+            file.read(reinterpret_cast<char*>(buffer.data()), static_cast<std::streamsize>(size));
+            if (!file || static_cast<size_t>(file.gcount()) != size) {
+                std::cerr << "Error: Failed to read full contents of file " << filename
+                          << " (expected " << size << " bytes, got " << file.gcount() << ")" << std::endl;
+                return false;
+            }
+        }
         file.close();
         
         // Use Memory's writeBlock method for better encapsulation

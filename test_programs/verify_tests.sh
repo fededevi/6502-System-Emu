@@ -5,7 +5,7 @@
 echo "Verifying test program integrity..."
 echo ""
 
-cd test_programs || exit 1
+cd "$(dirname "$0")" || exit 1
 
 # Check if the binary exists
 if [ ! -f "6502_functional_test.bin" ]; then

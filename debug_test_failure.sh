@@ -24,6 +24,11 @@ ADDRESS=${ADDRESS#0x}
 ADDRESS=${ADDRESS#0X}
 ADDRESS=$(echo "$ADDRESS" | tr '[:upper:]' '[:lower:]')
 
+# Zero-pad to 4 hex digits to match listing format (e.g., "0674 :")
+# Convert to decimal, then format as 4-digit hex
+ADDRESS_DEC=$((16#$ADDRESS))
+ADDRESS=$(printf "%04x" $ADDRESS_DEC)
+
 echo "Looking for address $ADDRESS in the test listing..."
 echo "=================================================="
 echo ""

@@ -3,23 +3,11 @@ QT -= gui
 CONFIG += c++11 console
 CONFIG -= app_bundle
 
+# Only compile cpu.cpp which includes all instruction implementations
 SOURCES += \
     test_runner.cpp \
     cpu.cpp \
-    memory.cpp \
-    load.cpp \
-    store.cpp \
-    addcarry.cpp \
-    subtract.cpp \
-    transfer.cpp \
-    stack.cpp \
-    logical.cpp \
-    branch.cpp \
-    incdec.cpp \
-    compare.cpp \
-    shifts.cpp \
-    flags.cpp \
-    misc.cpp
+    memory.cpp
 
 HEADERS += \
     cpu.h \

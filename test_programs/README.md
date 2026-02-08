@@ -58,8 +58,14 @@ CPU cpu(&mem);
 
 // Load the test binary at address 0x0000
 FILE* fp = fopen("test_programs/6502_functional_test.bin", "rb");
-fread(mem.data, 1, 65536, fp);
+uint8_t buffer[65536];
+size_t bytesRead = fread(buffer, 1, sizeof(buffer), fp);
 fclose(fp);
+
+// Copy loaded data into emulator memory using the public API
+if (bytesRead > 0) {
+    mem.writeBlock(0x0000, buffer, bytesRead);
+}
 
 // Set PC to start address
 cpu.PC = 0x0400;
