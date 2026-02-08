@@ -1,8 +1,21 @@
 #include "cpu.h"
 
+// Forward declaration of common helper function
+void SetNZ(CPU * cpu, Byte reg);
+
 #include "load.cpp"
 #include "store.cpp"
 #include "addcarry.cpp"
+#include "subtract.cpp"
+#include "transfer.cpp"
+#include "stack.cpp"
+#include "flags.cpp"
+#include "incdec.cpp"
+#include "logical.cpp"
+#include "compare.cpp"
+#include "branch.cpp"
+#include "shifts.cpp"
+#include "misc.cpp"
 
 CPU::CPU(Memory *_mem): mem(_mem){
 
@@ -16,6 +29,12 @@ void BRK(CPU * cpu) {
     cpu->setB(true);
 }
 
+// Common helper function for setting N and Z flags
+void SetNZ(CPU * cpu, Byte reg) {
+    cpu->setZ(reg == 0);
+    cpu->setN((reg & 0b10000000) > 0);
+}
+
 
 #define re mem->read
 #define wr mem->write
@@ -24,22 +43,22 @@ void BRK(CPU * cpu) {
 //Instructions
 void (*functptr[256])(CPU *) = {
         //          0        1       2       3       4       5       6       7       8       9       A       B       C       D       E       F
-        /*0*/       &BRK,    0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
-        /*1*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
-        /*2*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
-        /*3*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
-        /*4*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
-        /*5*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
-        /*6*/       0,       ADCIX,  0,      0,      0,      ADCZ,   0,      0,      0,      ADCI,   0,      0,      0,      ADCA,   0,      0,
-        /*7*/       0,       ADCIY,  0,      0,      0,      ADCZX,  0,      0,      0,      ADCAY,  0,      0,      0,      ADCAX,  0,      0,
-        /*8*/       0,       &STAIX, 0,      0,      &STYZP, &STAZ,  &STXZP, 0,      0,      0,      0,      0,      &STYA,  &STAA,  &STXA,  0,
-        /*9*/       0,       &STAIY, 0,      0,      &STYZPX,&STAZX, &STXZPY,0,      0,      &STAAY, 0,      0,      0,      &STAAX, 0,      0,
-        /*A*/       &LDYI,   &LDAIX, &LDXI,  0,      LDYZP,  &LDAZ,  &LDXZP, 0,      0,      &LDAI,  0,      0,      LDYA,   &LDAA,  &LDXA,  0,
-        /*B*/       0,       &LDAIY, 0,      0,      LDYZPY, &LDAZX, &LDXZPY,0,      0,      &LDAAY, 0,      0,      LDYAY,  &LDAAX, &LDXAY, 0,
-        /*C*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
-        /*D*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
-        /*E*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,
-        /*F*/       0,       0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0,      0
+        /*0*/       &BRK,    &ORAIX, 0,      0,      0,      &ORAZP, &ASLZP, 0,      &PHP,   &ORAI,  &ASLA,  0,      0,      &ORAA,  &ASLABS,0,
+        /*1*/       &BPL,    &ORAIY, 0,      0,      0,      &ORAZPX,&ASLZPX,0,      &CLC,   &ORAAY, 0,      0,      0,      &ORAAX, &ASLABSX,0,
+        /*2*/       &JSR,    &ANDIX, 0,      0,      &BITZP, &ANDZP, &ROLZP, 0,      &PLP,   &ANDI,  &ROLA,  0,      &BITABS,&ANDA,  &ROLABS,0,
+        /*3*/       &BMI,    &ANDIY, 0,      0,      0,      &ANDZPX,&ROLZPX,0,      &SEC,   &ANDAY, 0,      0,      0,      &ANDAX, &ROLABSX,0,
+        /*4*/       &RTI,    &EORIX, 0,      0,      0,      &EORZP, &LSRZP, 0,      &PHA,   &EORI,  &LSRA,  0,      &JMPABS,&EORA,  &LSRABS,0,
+        /*5*/       &BVC,    &EORIY, 0,      0,      0,      &EORZPX,&LSRZPX,0,      &CLI,   &EORAY, 0,      0,      0,      &EORAX, &LSRABSX,0,
+        /*6*/       &RTS,    &ADCIX, 0,      0,      0,      &ADCZ,  &RORZP, 0,      &PLA,   &ADCI,  &RORA,  0,      &JMPIND,&ADCA,  &RORABS,0,
+        /*7*/       &BVS,    &ADCIY, 0,      0,      0,      &ADCZX, &RORZPX,0,      &SEI,   &ADCAY, 0,      0,      0,      &ADCAX, &RORABSX,0,
+        /*8*/       0,       &STAIX, 0,      0,      &STYZP, &STAZ,  &STXZP, 0,      &DEY,   0,      &TXA,   0,      &STYA,  &STAA,  &STXA,  0,
+        /*9*/       &BCC,    &STAIY, 0,      0,      &STYZPX,&STAZX, &STXZPY,0,      &TYA,   &STAAY, &TXS,   0,      0,      &STAAX, 0,      0,
+        /*A*/       &LDYI,   &LDAIX, &LDXI,  0,      &LDYZP, &LDAZ,  &LDXZP, 0,      &TAY,   &LDAI,  &TAX,   0,      &LDYA,  &LDAA,  &LDXA,  0,
+        /*B*/       &BCS,    &LDAIY, 0,      0,      &LDYZPY,&LDAZX, &LDXZPY,0,      &CLV,   &LDAAY, &TSX,   0,      &LDYAY, &LDAAX, &LDXAY, 0,
+        /*C*/       &CPYI,   &CMPIX, 0,      0,      &CPYZP, &CMPZP, &DECZP, 0,      &INY,   &CMPI,  &DEX,   0,      &CPYA,  &CMPA,  &DECA,  0,
+        /*D*/       &BNE,    &CMPIY, 0,      0,      0,      &CMPZPX,&DECZPX,0,      &CLD,   &CMPAY, 0,      0,      0,      &CMPAX, &DECAX, 0,
+        /*E*/       &CPXI,   &SBCIX, 0,      0,      &CPXZP, &SBCZP, &INCZP, 0,      &INX,   &SBCI,  &NOP,   0,      &CPXA,  &SBCA,  &INCA,  0,
+        /*F*/       &BEQ,    &SBCIY, 0,      0,      0,      &SBCZPX,&INCZPX,0,      &SED,   &SBCAY, 0,      0,      0,      &SBCAX, &INCAX, 0
         } ;
 
 
