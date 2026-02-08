@@ -19,18 +19,25 @@ Word decimalSubtract(CPU * cpu, Word addr) {
     int lowNibble = (a & 0x0F) - (b & 0x0F) - borrow;
     int lowBorrow = 0;
     if (lowNibble < 0) {
-        lowNibble -= 6;  // Adjust for BCD
+        lowNibble += 10;  // Borrow from high nibble
         lowBorrow = 1;
     }
     
     // Subtract high nibbles (tens place) with borrow from low nibble
     int highNibble = (a >> 4) - (b >> 4) - lowBorrow;
+    int highBorrow = 0;
     if (highNibble < 0) {
-        highNibble -= 6;  // Adjust for BCD
+        highNibble += 10;  // Underflow
+        highBorrow = 1;
     }
     
     // Combine nibbles
     Word result = ((highNibble & 0x0F) << 4) | (lowNibble & 0x0F);
+    
+    // Set bit 8 if there was a borrow (for carry flag detection)
+    if (highBorrow) {
+        result |= 0x100;
+    }
     
     return result;
 }
