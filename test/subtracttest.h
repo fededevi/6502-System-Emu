@@ -161,4 +161,79 @@ private slots:
         cpu.execute();
         QCOMPARE(cpu.A, (Byte)0x20); // 52 - 20 = 32
     }
+
+    // Decimal Mode Tests
+    void testSBCDecimalModeBasic() {
+        cpu.reset();
+        cpu.A = 0x50; // 50 in BCD
+        cpu.setC(true); // No borrow
+        cpu.setD(true); // Enable decimal mode
+        mem.write(0x8000, 0xE9); // SBC Immediate
+        mem.write(0x8001, 0x25); // 25 in BCD
+        cpu.execute();
+        QCOMPARE(cpu.A, (Byte)0x25); // 50 - 25 = 25 in BCD
+        QCOMPARE(cpu.C(), (Byte)1); // No borrow
+    }
+
+    void testSBCDecimalModeWithBorrow() {
+        cpu.reset();
+        cpu.A = 0x50; // 50 in BCD
+        cpu.setC(false); // Borrow
+        cpu.setD(true);
+        mem.write(0x8000, 0xE9); // SBC Immediate
+        mem.write(0x8001, 0x25); // 25 in BCD
+        cpu.execute();
+        QCOMPARE(cpu.A, (Byte)0x24); // 50 - 25 - 1 = 24 in BCD
+        QCOMPARE(cpu.C(), (Byte)1);
+    }
+
+    void testSBCDecimalModeNeedsBorrow() {
+        cpu.reset();
+        cpu.A = 0x32; // 32 in BCD
+        cpu.setC(true);
+        cpu.setD(true);
+        mem.write(0x8000, 0xE9); // SBC Immediate
+        mem.write(0x8001, 0x04); // 4 in BCD
+        cpu.execute();
+        QCOMPARE(cpu.A, (Byte)0x28); // 32 - 4 = 28 in BCD
+        QCOMPARE(cpu.C(), (Byte)1);
+    }
+
+    void testSBCDecimalModeZeroResult() {
+        cpu.reset();
+        cpu.A = 0x25; // 25 in BCD
+        cpu.setC(true);
+        cpu.setD(true);
+        mem.write(0x8000, 0xE9); // SBC Immediate
+        mem.write(0x8001, 0x25); // 25 in BCD
+        cpu.execute();
+        QCOMPARE(cpu.A, (Byte)0x00); // 25 - 25 = 0
+        QCOMPARE(cpu.Z(), (Byte)1); // Zero flag set
+        QCOMPARE(cpu.C(), (Byte)1);
+    }
+
+    void testSBCDecimalModeCrossNibble() {
+        cpu.reset();
+        cpu.A = 0x46; // 46 in BCD
+        cpu.setC(true);
+        cpu.setD(true);
+        mem.write(0x8000, 0xE9); // SBC Immediate
+        mem.write(0x8001, 0x08); // 8 in BCD
+        cpu.execute();
+        QCOMPARE(cpu.A, (Byte)0x38); // 46 - 8 = 38 in BCD
+        QCOMPARE(cpu.C(), (Byte)1);
+    }
+
+    void testSBCDecimalModeZeroPage() {
+        cpu.reset();
+        cpu.A = 0x75; // 75 in BCD
+        cpu.setC(true);
+        cpu.setD(true);
+        mem.write(0x8000, 0xE5); // SBC Zero Page
+        mem.write(0x8001, 0x10);
+        mem.write(0x0010, 0x30); // 30 in BCD
+        cpu.execute();
+        QCOMPARE(cpu.A, (Byte)0x45); // 75 - 30 = 45 in BCD
+        QCOMPARE(cpu.C(), (Byte)1);
+    }
 };

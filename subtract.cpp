@@ -9,26 +9,50 @@ Word binarySubtract(CPU * cpu, Word addr) {
 }
 
 Word decimalSubtract(CPU * cpu, Word addr) {
-    // TODO: implement proper BCD (Binary Coded Decimal) subtraction
-    // For now, just perform binary subtraction even in decimal mode
-    // This is a known limitation
-    return cpu->A - cpu->mem->read(addr) - (cpu->C() ? 0 : 1);
+    // BCD (Binary Coded Decimal) subtraction
+    // Each nibble represents a decimal digit (0-9)
+    Byte a = cpu->A;
+    Byte b = cpu->mem->read(addr);
+    Byte borrow = cpu->C() ? 0 : 1;  // On 6502, carry flag acts as "NOT borrow"
+    
+    // Subtract low nibbles (ones place)
+    int lowNibble = (a & 0x0F) - (b & 0x0F) - borrow;
+    int lowBorrow = 0;
+    if (lowNibble < 0) {
+        lowNibble -= 6;  // Adjust for BCD
+        lowBorrow = 1;
+    }
+    
+    // Subtract high nibbles (tens place) with borrow from low nibble
+    int highNibble = (a >> 4) - (b >> 4) - lowBorrow;
+    if (highNibble < 0) {
+        highNibble -= 6;  // Adjust for BCD
+    }
+    
+    // Combine nibbles
+    Word result = ((highNibble & 0x0F) << 4) | (lowNibble & 0x0F);
+    
+    return result;
 }
 
 void SBCFlags(CPU * cpu, Word binary, Word decimal) {
-    Byte result = binary & 0xFF;
+    Byte result = cpu->D() ? (decimal & 0xFF) : (binary & 0xFF);
     Byte operand = cpu->mem->read(cpu->addr16);
     
     // Set overflow flag: overflow occurs when sign of result differs from sign of A
     // and A and operand have different signs
     cpu->setV(((cpu->A ^ result) & 0x80) && ((cpu->A ^ operand) & 0x80));
+    
     cpu->setZ(result == 0);
     cpu->setN((result & 0x80) > 0);
-    // Carry flag: set when NO borrow (i.e., result is non-negative)
-    cpu->setC(!(binary & 0x100));  // Clear carry if borrow occurred
     
-    if (cpu->D())
-        cpu->setC(decimal >= 0);
+    if (cpu->D()) {
+        // In decimal mode, carry is set if NO borrow occurred (result >= 0)
+        cpu->setC(!(decimal & 0x100));
+    } else {
+        // In binary mode, carry is set when NO borrow (i.e., result is non-negative)
+        cpu->setC(!(binary & 0x100));
+    }
 }
 
 // SBC - Subtract with Carry
