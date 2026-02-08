@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include <chrono>
 #include "memory.h"
 #include "cpu.h"
@@ -29,8 +30,13 @@ public:
         std::cout << "Loading " << filename << " (" << size << " bytes) at 0x" 
                   << std::hex << startAddr << std::dec << std::endl;
         
-        file.read(reinterpret_cast<char*>(mem.mem + startAddr), size);
+        // Read into temporary buffer then write to memory
+        std::vector<Byte> buffer(size);
+        file.read(reinterpret_cast<char*>(buffer.data()), size);
         file.close();
+        
+        // Use Memory's writeBlock method for better encapsulation
+        mem.writeBlock(startAddr, buffer.data(), size);
         
         return true;
     }

@@ -17,6 +17,12 @@ void Memory::write(Word addr, Byte value) {
     mem[addr] = value;
 }
 
+void Memory::writeBlock(Word startAddr, const Byte* data, size_t length) {
+    for (size_t i = 0; i < length && (startAddr + i) < MEMORY_SIZE; i++) {
+        mem[startAddr + i] = data[i];
+    }
+}
+
 Memory::Memory() {
     for(int i=0; i<MEMORY_SIZE; i++)
         mem[i] = 0;

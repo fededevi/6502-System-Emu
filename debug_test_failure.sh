@@ -19,19 +19,17 @@ if [ ! -f "$LISTING" ]; then
     exit 1
 fi
 
-# Remove 0x prefix if present
+# Remove 0x prefix if present and normalize to lowercase
 ADDRESS=${ADDRESS#0x}
 ADDRESS=${ADDRESS#0X}
+ADDRESS=$(echo "$ADDRESS" | tr '[:upper:]' '[:lower:]')
 
-# Keep original case for search
-ADDRESS_LOWER=$(echo "$ADDRESS" | tr '[:upper:]' '[:lower:]')
-
-echo "Looking for address $ADDRESS_LOWER in the test listing..."
+echo "Looking for address $ADDRESS in the test listing..."
 echo "=================================================="
 echo ""
 
 # Search for the address and show context (format is "ADDR : ")
-RESULT=$(grep -n "^$ADDRESS_LOWER :" "$LISTING")
+RESULT=$(grep -n "^$ADDRESS :" "$LISTING")
 
 if [ -n "$RESULT" ]; then
     LINE_NUM=$(echo "$RESULT" | cut -d: -f1)
@@ -42,8 +40,8 @@ if [ -n "$RESULT" ]; then
     fi
     sed -n "${START},${END}p" "$LISTING"
 else
-    echo "Address $ADDRESS_LOWER not found in exact format."
+    echo "Address $ADDRESS not found in exact format."
     echo ""
     echo "Trying a broader search..."
-    grep -i -B 2 -A 5 "$ADDRESS_LOWER" "$LISTING" | head -30
+    grep -i -B 2 -A 5 "$ADDRESS" "$LISTING" | head -30
 fi

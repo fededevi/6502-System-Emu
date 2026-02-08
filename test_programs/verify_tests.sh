@@ -15,6 +15,12 @@ fi
 
 # Check file size (should be exactly 64KB)
 SIZE=$(stat -f%z "6502_functional_test.bin" 2>/dev/null || stat -c%s "6502_functional_test.bin" 2>/dev/null)
+
+if [ -z "$SIZE" ]; then
+    echo "✗ Error: Could not determine file size (stat command failed)"
+    exit 1
+fi
+
 if [ "$SIZE" -eq 65536 ]; then
     echo "✓ Binary size correct: 65536 bytes (64KB)"
 else
