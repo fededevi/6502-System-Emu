@@ -27,6 +27,7 @@ ui_*.h
 *.qmlc
 *.jsc
 Makefile*
+!Makefile.test_runner
 *build-*
 
 # Qt unit tests

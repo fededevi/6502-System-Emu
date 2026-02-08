@@ -29,7 +29,7 @@ public:
         std::cout << "Loading " << filename << " (" << size << " bytes) at 0x" 
                   << std::hex << startAddr << std::dec << std::endl;
         
-        file.read(reinterpret_cast<char*>(mem.data + startAddr), size);
+        file.read(reinterpret_cast<char*>(mem.mem + startAddr), size);
         file.close();
         
         return true;
@@ -62,14 +62,14 @@ public:
                         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
                         
                         std::cout << "\n✓ TEST PASSED!" << std::endl;
-                        std::cout << "Cycles executed: " << cpu.cycles << std::endl;
+                        std::cout << "Cycles executed: " << (unsigned long long)cpu.cycles << std::endl;
                         std::cout << "Time elapsed: " << duration.count() << " ms" << std::endl;
                         return true;
                     } else {
                         std::cout << "\n✗ TEST FAILED!" << std::endl;
                         std::cout << "Stopped at address: 0x" << std::hex << cpu.PC << std::dec << std::endl;
                         std::cout << "Expected to stop at: 0x" << std::hex << expectedSuccess << std::dec << std::endl;
-                        std::cout << "Cycles executed: " << cpu.cycles << std::endl;
+                        std::cout << "Cycles executed: " << (unsigned long long)cpu.cycles << std::endl;
                         dumpCPUState();
                         return false;
                     }

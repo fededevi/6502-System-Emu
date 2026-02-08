@@ -2,6 +2,9 @@
 
 #define CYCL cpu->cycl();
 
+// Forward declaration
+void SetNZ(CPU * cpu, Byte reg);
+
 // TAX - Transfer Accumulator to X (0xAA)
 void TAX(CPU * cpu) {
     CYCL
