@@ -1,0 +1,34 @@
+name: CI Tests
+
+on:
+  push:
+    branches: [ main, copilot/** ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install Qt
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qt6-base-dev qt6-base-dev-tools libqt6test6
+    
+    - name: Build Tests
+      run: |
+        cd test
+        qmake6 test.pro
+        make
+    
+    - name: Run Tests
+      run: |
+        cd test
+        ./test
+    
+    - name: Test Summary
+      if: always()
+      run: echo "Test execution completed"

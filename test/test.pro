@@ -15,6 +15,16 @@ HEADERS += \
     ../cpu.h \
     ../memory.h \
     addcarrytest.h \
+    branchtest.h \
+    comparetest.h \
     cputest.h \
+    flagstest.h \
+    incdectest.h \
     loadtest.h \
-    storetest.h
+    logicaltest.h \
+    misctest.h \
+    shiftstest.h \
+    stacktest.h \
+    storetest.h \
+    subtracttest.h \
+    transfertest.h
