@@ -58,8 +58,8 @@ void ADFlags(CPU * cpu, Word binary, Word decimal) {
     cpu->setN((result & 0x80) > 0);
     
     if (cpu->D()) {
-        // In decimal mode, carry is set if result > 99
-        cpu->setC(decimal > 0x99);
+        // In decimal mode, carry is set if result overflowed (bit 8 is set)
+        cpu->setC(decimal > 0xFF);
     } else {
         // In binary mode, carry is set if result > 255
         cpu->setC(binary > 0xFF);
