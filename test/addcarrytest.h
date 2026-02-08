@@ -255,5 +255,6 @@ private slots:
         mem.write(0x0010, 0x25); // 25 in BCD
         cpu.execute();
         QCOMPARE(cpu.A, (Byte)0x40); // 15 + 25 = 40 in BCD
+        QCOMPARE(cpu.C(), (Byte)0); // No carry
     }
 };
