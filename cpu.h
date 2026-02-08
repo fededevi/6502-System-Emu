@@ -32,7 +32,7 @@ public:
     void pushPC();
     Byte popPC();
 
-    Byte immediate();
+    Word immediate();
     Byte zeroPage();
     Byte zeroPageX();
     Byte zeroPageY();
