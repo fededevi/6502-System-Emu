@@ -3,11 +3,15 @@
 #define CYCL cpu->cycl();
 
 Word binarySubtract(CPU * cpu, Word addr) {
+    // Perform binary subtraction: A - M - (1 - C)
+    // Note: On 6502, carry flag acts as "NOT borrow" for subtraction
     return cpu->A - cpu->mem->read(addr) - (cpu->C() ? 0 : 1);
 }
 
 Word decimalSubtract(CPU * cpu, Word addr) {
-    //TODO: implement proper BCD subtraction
+    // TODO: implement proper BCD (Binary Coded Decimal) subtraction
+    // For now, just perform binary subtraction even in decimal mode
+    // This is a known limitation
     return cpu->A - cpu->mem->read(addr) - (cpu->C() ? 0 : 1);
 }
 
@@ -20,7 +24,8 @@ void SBCFlags(CPU * cpu, Word binary, Word decimal) {
     cpu->setV(((cpu->A ^ result) & 0x80) && ((cpu->A ^ operand) & 0x80));
     cpu->setZ(result == 0);
     cpu->setN((result & 0x80) > 0);
-    cpu->setC(binary < 0x100);  // Carry is set if no borrow
+    // Carry flag: set when NO borrow (i.e., result is non-negative)
+    cpu->setC(!(binary & 0x100));  // Clear carry if borrow occurred
     
     if (cpu->D())
         cpu->setC(decimal >= 0);
