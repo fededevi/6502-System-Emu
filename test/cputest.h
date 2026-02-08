@@ -34,7 +34,7 @@ private slots:
 
     void immediateTest(){
         cpu.reset();
-        Byte addr = cpu.PC;
+        Word addr = cpu.PC;
         QCOMPARE( cpu.immediate(), addr);
     };
 

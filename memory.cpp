@@ -18,7 +18,8 @@ void Memory::write(Word addr, Byte value) {
 }
 
 Memory::Memory() {
-    mem[MEMORY_SIZE-1] = {0};
+    for(int i=0; i<MEMORY_SIZE; i++)
+        mem[i] = 0;
 }
 
 Memory Memory::randomMemory()

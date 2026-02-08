@@ -94,7 +94,7 @@ uint8_t CPU::popPC() {
 }
 
 
-Byte CPU::immediate() {
+Word CPU::immediate() {
     return PC++;
 }
 
@@ -132,16 +132,16 @@ Word CPU::absoluteX() {
     addr16 = re(PC++) + X;
     if (addr16 > 0xFF) CYCL;
     CYCL;
-    addr16 += re(PC++) >> 8;
+    addr16 += re(PC++) << 8;
     return addr16;
 }
 
 Word CPU::absoluteY() {
     CYCL;
-    addr16 = re(PC++) + X;
+    addr16 = re(PC++) + Y;
     if (addr16 > 0xFF) CYCL;
     CYCL;
-    addr16 += re(PC++) >> 8;
+    addr16 += re(PC++) << 8;
     return addr16;
 }
 
@@ -153,18 +153,20 @@ Word CPU::indirectX() {
     CYCL;
     addr16 = re(addr8);
     CYCL;
-    addr16 += re(addr8++) >> 8;
+    addr16 += re(addr8+1) << 8;
     return addr16;
 }
 
 Word CPU::indirectY() {
     CYCL;
-    addr16 = re(PC++) + X;
+    addr8 = re(PC++);
+    CYCL;
+    addr16 = re(addr8);
+    CYCL;
+    addr16 += re(addr8+1) << 8;
+    CYCL;
+    addr16 += Y;
     if (addr16 > 0xFF) CYCL;
-    CYCL;
-    addr16 += re(PC++) >> 8;
-    CYCL;
-    addr16 = re(addr16);
     return addr16;
 }
 
