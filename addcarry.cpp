@@ -15,18 +15,33 @@ Word decimalSum(CPU * cpu, Word addr) {
     
     // Add low nibbles (ones place)
     Word lowNibble = (a & 0x0F) + (b & 0x0F) + carry;
+    Word lowCarry = 0;
     if (lowNibble > 9) {
         lowNibble += 6;  // Adjust for BCD
     }
+    // Check if we need to carry to high nibble
+    if (lowNibble > 15) {
+        lowCarry = 1;
+    }
     
     // Add high nibbles (tens place) with carry from low nibble
-    Word highNibble = (a >> 4) + (b >> 4) + (lowNibble > 15 ? 1 : 0);
+    Word highNibble = (a >> 4) + (b >> 4) + lowCarry;
+    Word highCarry = 0;
     if (highNibble > 9) {
         highNibble += 6;  // Adjust for BCD
     }
+    // Check if we need to carry out
+    if (highNibble > 15) {
+        highCarry = 1;
+    }
     
-    // Combine nibbles
+    // Combine nibbles - result is in BCD format
     Word result = ((highNibble & 0x0F) << 4) | (lowNibble & 0x0F);
+    
+    // Return with carry bit in upper byte if overflow
+    if (highCarry) {
+        result |= 0x100;
+    }
     
     return result;
 }
