@@ -243,7 +243,7 @@ TEST_F(MyTest, TestName) {
 
 1. **Tests fail after code changes** - Run individual test suites to identify which instruction broke
 2. **Functional test fails** - Check PC value; look up in `6502_functional_test.lst` for details
-3. **Tests timeout** - Increase cycle limit in test command: `-m 200000000`
+3. **Tests timeout** - Increase the maximum cycle limit for the emulator using the `-m` flag (e.g., `./6502_emu -m 200000000`). This sets how many CPU cycles the emulator will execute before terminating.
 
 ### Memory Issues
 
@@ -263,7 +263,7 @@ Before committing changes:
 
 ## Style Guidelines
 
-- **No comments unless necessary** - Code should be self-documenting
+- **Minimize comments by writing clear code** - Document complex CPU behaviors, edge cases, and non-obvious implementation details that aren't self-evident from code alone
 - **Follow existing patterns** - Match the style of surrounding code
 - **Use existing types** - Byte, Word, SByte from types.h
 - **Consistent naming** - Instructions use opcode_mode format (e.g., LDA_IM, LDA_ZP)
