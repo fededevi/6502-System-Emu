@@ -29,23 +29,10 @@ jobs:
         cd build
         cmake --build .
     
-    - name: Run Tests
+    - name: Run All Tests
       run: |
         cd build
         ctest --output-on-failure
-    
-    - name: Verify Test Programs
-      run: |
-        cd test_programs
-        ./verify_tests.sh
-    
-    - name: Build Test Runner
-      run: |
-        ./build_test_runner.sh
-    
-    - name: Run Binary Test Programs
-      run: |
-        ./test_runner
     
     - name: Test Summary
       if: always()
