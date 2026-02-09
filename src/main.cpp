@@ -1,11 +1,13 @@
 #include "memory.h"
 #include "cpu.h"
+#include "display.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
 #include <cstdlib>
 #include <chrono>
+#include <thread>
 
 void printUsage(const char* progName) {
     std::cout << "Usage: " << progName << " [options]\n"
@@ -14,6 +16,8 @@ void printUsage(const char* progName) {
               << "  -a <address>    Address to load program at (default: 0x0000, hex format)\n"
               << "  -pc <address>   Set program counter (default: from reset vector, hex format)\n"
               << "  -m <cycles>     Maximum cycles to execute (default: 100000000)\n"
+              << "  -g              Enable graphical display mode\n"
+              << "  -r <rate>       Display refresh rate in Hz (default: 30, only with -g)\n"
               << "  -h              Show this help message\n";
 }
 
@@ -62,12 +66,15 @@ bool loadBinary(Memory& mem, const std::string& filename, Word startAddr = 0x000
 int main(int argc, char* argv[]) {
     Memory mem;
     CPU cpu(&mem);
+    Display display(&mem);
     
     std::string programFile;
     Word loadAddr = 0x0000;
     Word programCounter = 0xFFFF;  // Use reset vector by default
     unsigned long long maxCycles = 100000000;
     bool hasCustomPC = false;
+    bool graphicsMode = false;
+    int refreshRate = 30;  // Hz
     
     // Parse command-line arguments
     for (int i = 1; i < argc; i++) {
@@ -85,6 +92,10 @@ int main(int argc, char* argv[]) {
             hasCustomPC = true;
         } else if (arg == "-m" && i + 1 < argc) {
             maxCycles = std::stoull(argv[++i], nullptr, 0);
+        } else if (arg == "-g") {
+            graphicsMode = true;
+        } else if (arg == "-r" && i + 1 < argc) {
+            refreshRate = std::stoi(argv[++i]);
         } else {
             std::cerr << "Unknown option: " << arg << std::endl;
             printUsage(argv[0]);
@@ -110,21 +121,45 @@ int main(int argc, char* argv[]) {
         cpu.PC = loadAddr;
     }
     
+    // Enable graphics mode if requested
+    if (graphicsMode) {
+        display.setEnabled(true);
+        display.clear();
+        std::cout << "Graphics mode enabled (32x32 display at $0200-$05FF)\n";
+        std::cout << "Refresh rate: " << refreshRate << " Hz\n";
+    }
+    
     std::cout << "Starting execution at PC=0x" << std::hex << cpu.PC << std::dec << std::endl;
     
     auto startTime = std::chrono::high_resolution_clock::now();
+    auto lastDisplayUpdate = startTime;
     Word prevPC = cpu.PC;
     Word sameCount = 0;
+    
+    const int displayUpdateInterval = 1000000 / refreshRate;  // microseconds
     
     // Execute until max cycles or infinite loop detected
     while (cpu.cycles < maxCycles) {
         cpu.execute();
         
+        // Update display at specified refresh rate
+        if (graphicsMode) {
+            auto now = std::chrono::high_resolution_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - lastDisplayUpdate);
+            
+            if (elapsed.count() >= displayUpdateInterval) {
+                display.render();
+                lastDisplayUpdate = now;
+            }
+        }
+        
         // Detect infinite loops (PC not changing for multiple iterations)
         if (cpu.PC == prevPC) {
             sameCount++;
             if (sameCount > 5) {
-                std::cout << "\nInfinite loop detected at PC=0x" << std::hex << cpu.PC << std::dec << std::endl;
+                if (!graphicsMode) {
+                    std::cout << "\nInfinite loop detected at PC=0x" << std::hex << cpu.PC << std::dec << std::endl;
+                }
                 break;
             }
         } else {
@@ -135,6 +170,13 @@ int main(int argc, char* argv[]) {
     
     auto endTime = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+    
+    // Final display update
+    if (graphicsMode) {
+        display.render();
+        // Move cursor below the display
+        std::cout << "\n";
+    }
     
     std::cout << "\nExecution completed:" << std::endl;
     std::cout << "  Cycles: " << static_cast<unsigned long long>(cpu.cycles) << std::endl;

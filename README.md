@@ -89,6 +89,9 @@ After building, the main executable supports command-line arguments for flexible
 
 # Load program with custom cycle limit
 ./build/6502_emu -f program.bin -a 0000 -m 1000000
+
+# Run with graphical display mode (32x32 character display)
+./build/6502_emu -f program.bin -pc 0600 -g -r 30
 ```
 
 **Command-line Options:**
@@ -96,7 +99,79 @@ After building, the main executable supports command-line arguments for flexible
 - `-a <address>` - Address to load program at (hex, default: 0x0000)
 - `-pc <address>` - Set program counter (hex, default: from reset vector)
 - `-m <cycles>` - Maximum cycles to execute (default: 100000000)
+- `-g` - Enable graphical display mode (renders video memory at $0200-$05FF as 32x32 display)
+- `-r <rate>` - Display refresh rate in Hz (default: 30, only with -g)
 - `-h` - Display help message
+
+## Graphical Display Mode
+
+The emulator includes a terminal-based graphical display system that maps memory region `$0200-$05FF` to a 32x32 character display. This allows 6502 programs to create visual output by writing to video memory.
+
+### Display Memory Map
+
+- **Video Memory**: `$0200-$05FF` (1024 bytes)
+- **Display Size**: 32 columns × 32 rows
+- **Addressing**: `$0200 + (Y * 32) + X` where X is column (0-31) and Y is row (0-31)
+
+### Character Values
+
+Each byte in video memory determines the character displayed:
+- `$00`: Empty space
+- `$01`: Solid block (█)
+- `$02`: Circle (●)
+- `$03-$05`: Various shades (▓▒░)
+- `$06-$09`: Card suits (♦♥♣♠)
+- `$10+`: Colored variants with ANSI color codes
+- `$20-$7E`: ASCII characters
+
+### Demo Programs
+
+The repository includes demo programs that showcase the graphical capabilities:
+
+```bash
+# Run the animated pattern demo
+./build/6502_emu -f test_programs/animated_pattern.bin -pc 0600 -g -r 10 -m 1000000
+
+# Run the simple pattern demo
+./build/6502_emu -f test_programs/pattern_demo.bin -pc 0600 -g -m 100000
+```
+
+### Creating Your Own Graphics Programs
+
+Write to the display memory region to create graphics:
+
+```assembly
+; Example: Draw a block at position (10, 15)
+LDA #$01        ; Load solid block character
+LDY #15         ; Row 15
+LDX #10         ; Column 10
+
+; Calculate address: $0200 + (Y * 32) + X
+TYA
+ASL A           ; Multiply Y by 32 (shift left 5 times)
+ASL A
+ASL A
+ASL A
+ASL A
+STA $10         ; Store low byte
+LDA #$02
+STA $11         ; Store high byte
+
+TXA
+CLC
+ADC $10
+STA $10
+LDA $11
+ADC #$00
+STA $11
+
+; Store character
+LDA #$01
+LDY #$00
+STA ($10),Y
+```
+
+You can create the binary programs using the Python scripts in `test_programs/` as examples, or use a 6502 assembler.
 
 ## Testing
 

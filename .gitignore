@@ -35,3 +35,8 @@ compile_commands.json
 *creator.user*
 
 .cache/
+
+# Generated demo binaries (can be regenerated with Python scripts)
+test_programs/pattern_demo.bin
+test_programs/animated_pattern.bin
+test_programs/snake.bin
