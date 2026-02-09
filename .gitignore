@@ -27,6 +27,7 @@ ui_*.h
 *.qmlc
 *.jsc
 Makefile*
+!Makefile.test_runner
 *build-*
 
 # Qt unit tests
@@ -47,6 +48,9 @@ compile_commands.json
 
 # QtCreator local machine specific files for imported projects
 *creator.user*
+
+# Test runner binary
+test_runner
 
 # CMake
 build/

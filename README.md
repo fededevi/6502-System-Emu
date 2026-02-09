@@ -1,8 +1,16 @@
 # 6502-System-Emu
 
-A 6502 CPU System Emulator with modern CMake build system.
 
-## Building
+A comprehensive 6502 CPU emulator implementation with extensive testing capabilities.
+
+## Features
+
+- Full 6502 instruction set implementation
+- Decimal mode (BCD) arithmetic support
+- Comprehensive unit tests for all instructions
+- Industry-standard functional test programs integrated
+- Hexdump utilities for verification
+- Modern CMake build system
 
 ### Prerequisites
 
@@ -27,39 +35,6 @@ cmake --build .
 ctest --output-on-failure
 ```
 
-### Running the Emulator
-
-After building, run the emulator with:
-
-```bash
-./6502_emu
-```
-
-### Running Tests
-
-The test suite uses Qt Test framework. Run tests using CTest:
-
-```bash
-cd build
-ctest --output-on-failure
-```
-
-Or run the test executable directly:
-
-```bash
-./test/6502_tests
-```
-
-## Development
-
-The project is organized as follows:
-
-- `cpu.cpp`, `cpu.h` - CPU implementation
-- `memory.cpp`, `memory.h` - Memory management
-- `main.cpp` - Main emulator entry point
-- `test/` - Test suite using Qt Test framework
-- Various instruction implementation files (load.cpp, store.cpp, etc.)
-
 ### Building with Different Generators
 
 CMake supports multiple build systems:
@@ -78,10 +53,105 @@ cmake -G "Visual Studio 17 2022" ..
 cmake --build . --config Release
 ```
 
+## Project Structure
+
+- **Core Emulator:**
+  - `cpu.h`, `cpu.cpp` - CPU implementation
+  - `memory.h`, `memory.cpp` - Memory system
+  - `*.cpp` - Individual instruction implementations
+
+- **Unit Tests:**
+  - `test/` - Qt-based unit test suite
+  - See `test/README.md` for details
+
+- **Binary Test Programs:**
+  - `test_programs/` - Industry-standard 6502 test binaries
+  - Includes Klaus Dormann's functional test suite
+  - See `test_programs/README.md` for details
+
+## Running the Emulator
+
+After building, run the emulator with:
+
+```bash
+./6502_emu
+```
+
+## Testing
+
+This project includes multiple levels of testing:
+
+### 1. Unit Tests
+
+Run the test suite using CTest:
+
+```bash
+cd build
+ctest --output-on-failure
+```
+
+Or run the test executable directly:
+
+```bash
+./test/6502_tests
+```
+
+### 2. Functional Tests (Binary Test Programs)
+
+The `test_programs/` directory contains comprehensive binary test programs:
+
+- **6502_functional_test.bin** - Klaus Dormann's complete functional test
+- **Hexdump files** - For verification and debugging
+- **Listing files** - Assembly source with comments
+
+Build and run the test runner:
+
+```bash
+./build_test_runner.sh
+./test_runner
+```
+
+Or manually with qmake (if available):
+
+```bash
+qmake6 test_runner.pro
+make
+./test_runner
+```
+
+To verify test program integrity:
+
+```bash
+cd test_programs
+./verify_tests.sh
+```
+
+### 3. Hexdump Verification
+
+Ensure test binaries are loaded correctly using the provided hexdump utilities.
+
 ## Legacy Build System
 
 The project previously used Qt's `.pro` files for building. These files are still present for backwards compatibility:
 
-- `6502.pro` - Main application project file
-- `test/test.pro` - Test suite project file
+### Main Emulator (Legacy)
 
+```bash
+qmake6 6502.pro
+make
+```
+
+### Unit Tests (Legacy)
+
+```bash
+cd test
+qmake6 test.pro
+make
+./test
+```
+
+## Resources
+
+- [Klaus Dormann's 6502 Test Suite](https://github.com/Klaus2m5/6502_65C02_functional_tests)
+- [6502.org Documentation](http://www.6502.org/)
+- [Visual 6502](http://visual6502.org/)
