@@ -18,12 +18,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(EMULATOR_SOURCES
     src/core/cpu.cpp
     src/core/memory.cpp
+    src/core/display.cpp
 )
 
 set(EMULATOR_HEADERS
     src/core/cpu.h
     src/core/memory.h
     src/core/types.h
+    src/core/display.h
 )
 
 # Create a library with the emulator code
