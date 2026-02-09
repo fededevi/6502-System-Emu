@@ -67,7 +67,7 @@ TEST_F(StackTest, testPHP) {
         cpu.P = 0xC5;
         Byte oldSP = cpu.SP;
         cpu.execute();
-        EXPECT_EQ((Byte)0xD5, mem.read(0x100 + oldSP)); // B flag is set when pushed
+        EXPECT_EQ((Byte)0xF5, mem.read(0x100 + oldSP)); // B flag (bit 4) and unused flag (bit 5) are set when pushed
         EXPECT_EQ((Byte)(oldSP - 1), cpu.SP);
 }
 
