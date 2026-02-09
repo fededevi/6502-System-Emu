@@ -43,19 +43,19 @@ public:
     Word indirectY();
 
     void setN(bool);
-    Byte N() { return (P & (1 << 0)) > 0; };
+    Byte N() { return (P & (1 << 7)) > 0; };
     void setV(bool);
-    Byte V() { return (P & (1 << 1)) > 0; };
+    Byte V() { return (P & (1 << 6)) > 0; };
     void setB(bool);
-    Byte B() { return (P & (1 << 3)) > 0; };
+    Byte B() { return (P & (1 << 4)) > 0; };
     void setD(bool);
-    Byte D() { return (P & (1 << 4)) > 0; };
+    Byte D() { return (P & (1 << 3)) > 0; };
     void setI(bool);
-    Byte I() { return (P & (1 << 5)) > 0; };
+    Byte I() { return (P & (1 << 2)) > 0; };
     void setZ(bool);
-    Byte Z() { return (P & (1 << 6)) > 0; };
+    Byte Z() { return (P & (1 << 1)) > 0; };
     void setC(bool);
-    Byte C() { return (P & (1 << 7)) > 0; };
+    Byte C() { return (P & (1 << 0)) > 0; };
 
     // Cycles
     __int128 cycles = 0;
