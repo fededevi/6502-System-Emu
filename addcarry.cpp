@@ -46,13 +46,13 @@ Word decimalSum(CPU * cpu, Word addr) {
     return result;
 }
 
-void ADFlags(CPU * cpu, Word binary, Word decimal) {
+void ADFlags(CPU * cpu, Word binary, Word decimal, Byte memValue) {
     Byte result = cpu->D() ? (decimal & 0xFF) : (binary & 0xFF);
     
-    // In binary mode, overflow is based on signed arithmetic
-    // In decimal mode, the behavior varies by implementation
-    // Most commonly, V flag reflects binary overflow even in decimal mode
-    cpu->setV((binary & 0x80) != (cpu->A & 0x80));
+    // Overflow flag: set if sign of result differs from sign of both operands
+    // V = ~(A ^ M) & (A ^ result) & 0x80
+    // This is true when A and M have the same sign, but result has different sign
+    cpu->setV(((~(cpu->A ^ memValue)) & (cpu->A ^ result) & 0x80) != 0);
     
     cpu->setZ(result == 0);
     cpu->setN((result & 0x80) > 0);
@@ -68,64 +68,72 @@ void ADFlags(CPU * cpu, Word binary, Word decimal) {
 
 void ADCIX( CPU * cpu) {
     Word addr = cpu->indirectX();
+    Byte memValue = cpu->mem->read(addr);
     Word binary = binarySum(cpu, addr);
     Word decimal = decimalSum(cpu, addr);
-    ADFlags(cpu, binary, decimal );
+    ADFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void ADCZ( CPU * cpu) {
     Word addr = cpu->zeroPage();
+    Byte memValue = cpu->mem->read(addr);
     Word binary = binarySum(cpu, addr);
     Word decimal = decimalSum(cpu, addr);
-    ADFlags(cpu, binary, decimal );
+    ADFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void ADCI( CPU * cpu) {
     Word addr = cpu->immediate();
+    Byte memValue = cpu->mem->read(addr);
     Word binary = binarySum(cpu, addr);
     Word decimal = decimalSum(cpu, addr);
-    ADFlags(cpu, binary, decimal );
+    ADFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void ADCA( CPU * cpu) {
     Word addr = cpu->absolute();
+    Byte memValue = cpu->mem->read(addr);
     Word binary = binarySum(cpu, addr);
     Word decimal = decimalSum(cpu, addr);
-    ADFlags(cpu, binary, decimal );
+    ADFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void ADCIY( CPU * cpu) {
     Word addr = cpu->indirectY();
+    Byte memValue = cpu->mem->read(addr);
     Word binary = binarySum(cpu, addr);
     Word decimal = decimalSum(cpu, addr);
-    ADFlags(cpu, binary, decimal );
+    ADFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void ADCZX( CPU * cpu) {
     Word addr = cpu->zeroPageX();
+    Byte memValue = cpu->mem->read(addr);
     Word binary = binarySum(cpu, addr);
     Word decimal = decimalSum(cpu, addr);
-    ADFlags(cpu, binary, decimal );
+    ADFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void ADCAY( CPU * cpu) {
     Word addr = cpu->absoluteY();
+    Byte memValue = cpu->mem->read(addr);
     Word binary = binarySum(cpu, addr);
     Word decimal = decimalSum(cpu, addr);
-    ADFlags(cpu, binary, decimal );
+    ADFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void ADCAX( CPU * cpu) {
     Word addr = cpu->absoluteX();
+    Byte memValue = cpu->mem->read(addr);
     Word binary = binarySum(cpu, addr);
     Word decimal = decimalSum(cpu, addr);
-    ADFlags(cpu, binary, decimal );
+    ADFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
