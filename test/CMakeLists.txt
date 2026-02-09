@@ -1,46 +1,45 @@
-# Find Qt5 Test module
-find_package(Qt5 COMPONENTS Test REQUIRED)
-
-# Enable automoc for Qt
-set(CMAKE_AUTOMOC ON)
+# Fetch Google Test
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG v1.14.0
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
 
 # Define test sources
 set(TEST_SOURCES
     main.cpp
-)
-
-# Define test headers
-set(TEST_HEADERS
-    addcarrytest.h
-    branchtest.h
-    comparetest.h
-    cputest.h
-    flagstest.h
-    incdectest.h
-    loadtest.h
-    logicaltest.h
-    misctest.h
-    shiftstest.h
-    stacktest.h
-    storetest.h
-    subtracttest.h
-    transfertest.h
+    addcarrytest.cpp
+    branchtest.cpp
+    comparetest.cpp
+    cputest.cpp
+    flagstest.cpp
+    incdectest.cpp
+    loadtest.cpp
+    logicaltest.cpp
+    misctest.cpp
+    shiftstest.cpp
+    stacktest.cpp
+    storetest.cpp
+    subtracttest.cpp
+    transfertest.cpp
 )
 
 # Create test executable
-# Note: Headers are included here so that CMake's AUTOMOC can process them
-# These headers contain Qt test classes with Q_OBJECT macros
 add_executable(6502_tests
     ${TEST_SOURCES}
-    ${TEST_HEADERS}
 )
 
-# Link against Qt5::Test and the emulator library
+# Link against Google Test and the emulator library
 target_link_libraries(6502_tests
     PRIVATE
-    Qt5::Test
+    GTest::gtest_main
     6502_emulator
 )
 
-# Add test to CTest
-add_test(NAME 6502_emulator_tests COMMAND 6502_tests)
+# Enable Google Test integration with CTest
+include(GoogleTest)
+gtest_discover_tests(6502_tests)

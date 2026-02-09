@@ -1,95 +1,92 @@
-#pragma once
-
-#include <QtTest>
+#include <gtest/gtest.h>
 #include "../cpu.h"
 #include "../memory.h"
 
-class StackTest : public QObject
-{
-    Q_OBJECT
-
+class StackTest : public ::testing::Test {
+protected:
     Memory mem;
     CPU cpu;
 
-public:
     StackTest()
         : mem()
         , cpu(&mem)
     {};
     ~StackTest(){};
 
-private slots:
-    void initTestCase() {
+    void SetUp() override {
+
         mem.write(0xFFFC, 0x00);
         mem.write(0xFFFD, 0x80);
     }
+};
 
-    // PHA - Push Accumulator (0x48)
-    void testPHA() {
+TEST_F(StackTest, testPHA) {
+
         cpu.reset();
         mem.write(0x8000, 0x48);
         cpu.A = 0x77;
         Byte oldSP = cpu.SP;
         cpu.execute();
-        QCOMPARE(mem.read(0x100 + oldSP), (Byte)0x77);
-        QCOMPARE(cpu.SP, (Byte)(oldSP - 1));
-    }
+        EXPECT_EQ((Byte)0x77, mem.read(0x100 + oldSP));
+        EXPECT_EQ((Byte)(oldSP - 1), cpu.SP);
+}
 
-    // PLA - Pull Accumulator (0x68)
-    void testPLA() {
+TEST_F(StackTest, testPLA) {
+
         cpu.reset();
         mem.write(0x8000, 0x68);
         cpu.push(0x88);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x88);
-    }
+        EXPECT_EQ((Byte)0x88, cpu.A);
+}
 
-    void testPLA_Zero() {
+TEST_F(StackTest, testPLA_Zero) {
+
         cpu.reset();
         mem.write(0x8000, 0x68);
         cpu.push(0x00);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x00);
-        QCOMPARE(cpu.Z(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)0x00, cpu.A);
+        EXPECT_EQ((Byte)1, cpu.Z());
+}
 
-    void testPLA_Negative() {
+TEST_F(StackTest, testPLA_Negative) {
+
         cpu.reset();
         mem.write(0x8000, 0x68);
         cpu.push(0x80);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x80);
-        QCOMPARE(cpu.N(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)0x80, cpu.A);
+        EXPECT_EQ((Byte)1, cpu.N());
+}
 
-    // PHP - Push Processor Status (0x08)
-    void testPHP() {
+TEST_F(StackTest, testPHP) {
+
         cpu.reset();
         mem.write(0x8000, 0x08);
         cpu.P = 0xC5;
         Byte oldSP = cpu.SP;
         cpu.execute();
-        QCOMPARE(mem.read(0x100 + oldSP), (Byte)0xD5); // B flag is set when pushed
-        QCOMPARE(cpu.SP, (Byte)(oldSP - 1));
-    }
+        EXPECT_EQ((Byte)0xD5, mem.read(0x100 + oldSP)); // B flag is set when pushed
+        EXPECT_EQ((Byte)(oldSP - 1), cpu.SP);
+}
 
-    // PLP - Pull Processor Status (0x28)
-    void testPLP() {
+TEST_F(StackTest, testPLP) {
+
         cpu.reset();
         mem.write(0x8000, 0x28);
         cpu.push(0x42);
         cpu.execute();
-        QCOMPARE(cpu.P, (Byte)0x42);
-    }
+        EXPECT_EQ((Byte)0x42, cpu.P);
+}
 
-    // Test PHA/PLA together
-    void testPHAPLA() {
+TEST_F(StackTest, testPHAPLA) {
+
         cpu.reset();
         mem.write(0x8000, 0x48); // PHA
         mem.write(0x8001, 0x68); // PLA
         cpu.A = 0x99;
         cpu.execute();
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x99);
-    }
-};
+        EXPECT_EQ((Byte)0x99, cpu.A);
+}

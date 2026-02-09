@@ -1,75 +1,75 @@
-#pragma once
-
-#include <QtTest>
+#include <gtest/gtest.h>
 #include "../cpu.h"
 #include "../memory.h"
 
-class CompareTest : public QObject
-{
-    Q_OBJECT
-
+class CompareTest : public ::testing::Test {
+protected:
     Memory mem;
     CPU cpu;
 
-public:
     CompareTest()
         : mem()
         , cpu(&mem)
     {};
     ~CompareTest(){};
 
-private slots:
-    void initTestCase() {
+    void SetUp() override {
+
         mem.write(0xFFFC, 0x00);
         mem.write(0xFFFD, 0x80);
     }
+};
 
-    // CMP - Compare Accumulator
-    void testCMP_Immediate_Equal() {
+TEST_F(CompareTest, testCMP_Immediate_Equal) {
+
         cpu.reset();
         mem.write(0x8000, 0xC9); // CMP immediate
         mem.write(0x8001, 0x42);
         cpu.A = 0x42;
         cpu.execute();
-        QCOMPARE(cpu.Z(), (Byte)1); // Equal
-        QCOMPARE(cpu.C(), (Byte)1); // A >= M
-        QCOMPARE(cpu.N(), (Byte)0);
-    }
+        EXPECT_EQ((Byte)1, cpu.Z()); // Equal
+        EXPECT_EQ((Byte)1, cpu.C()); // A >= M
+        EXPECT_EQ((Byte)0, cpu.N());
+}
 
-    void testCMP_Immediate_Greater() {
+TEST_F(CompareTest, testCMP_Immediate_Greater) {
+
         cpu.reset();
         mem.write(0x8000, 0xC9);
         mem.write(0x8001, 0x10);
         cpu.A = 0x20;
         cpu.execute();
-        QCOMPARE(cpu.Z(), (Byte)0); // Not equal
-        QCOMPARE(cpu.C(), (Byte)1); // A >= M
-        QCOMPARE(cpu.N(), (Byte)0); // Result positive
-    }
+        EXPECT_EQ((Byte)0, cpu.Z()); // Not equal
+        EXPECT_EQ((Byte)1, cpu.C()); // A >= M
+        EXPECT_EQ((Byte)0, cpu.N()); // Result positive
+}
 
-    void testCMP_Immediate_Less() {
+TEST_F(CompareTest, testCMP_Immediate_Less) {
+
         cpu.reset();
         mem.write(0x8000, 0xC9);
         mem.write(0x8001, 0x50);
         cpu.A = 0x30;
         cpu.execute();
-        QCOMPARE(cpu.Z(), (Byte)0); // Not equal
-        QCOMPARE(cpu.C(), (Byte)0); // A < M
-        QCOMPARE(cpu.N(), (Byte)1); // Result negative
-    }
+        EXPECT_EQ((Byte)0, cpu.Z()); // Not equal
+        EXPECT_EQ((Byte)0, cpu.C()); // A < M
+        EXPECT_EQ((Byte)1, cpu.N()); // Result negative
+}
 
-    void testCMP_ZeroPage() {
+TEST_F(CompareTest, testCMP_ZeroPage) {
+
         cpu.reset();
         mem.write(0x8000, 0xC5); // CMP zero page
         mem.write(0x8001, 0x10);
         mem.write(0x0010, 0x42);
         cpu.A = 0x42;
         cpu.execute();
-        QCOMPARE(cpu.Z(), (Byte)1);
-        QCOMPARE(cpu.C(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)1, cpu.Z());
+        EXPECT_EQ((Byte)1, cpu.C());
+}
 
-    void testCMP_Absolute() {
+TEST_F(CompareTest, testCMP_Absolute) {
+
         cpu.reset();
         mem.write(0x8000, 0xCD); // CMP absolute
         mem.write(0x8001, 0x00);
@@ -77,42 +77,45 @@ private slots:
         mem.write(0x2000, 0x80);
         cpu.A = 0x90;
         cpu.execute();
-        QCOMPARE(cpu.Z(), (Byte)0);
-        QCOMPARE(cpu.C(), (Byte)1); // 0x90 >= 0x80
-    }
+        EXPECT_EQ((Byte)0, cpu.Z());
+        EXPECT_EQ((Byte)1, cpu.C()); // 0x90 >= 0x80
+}
 
-    // CPX - Compare X Register
-    void testCPX_Immediate_Equal() {
+TEST_F(CompareTest, testCPX_Immediate_Equal) {
+
         cpu.reset();
         mem.write(0x8000, 0xE0); // CPX immediate
         mem.write(0x8001, 0x33);
         cpu.X = 0x33;
         cpu.execute();
-        QCOMPARE(cpu.Z(), (Byte)1);
-        QCOMPARE(cpu.C(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)1, cpu.Z());
+        EXPECT_EQ((Byte)1, cpu.C());
+}
 
-    void testCPX_Immediate_Less() {
+TEST_F(CompareTest, testCPX_Immediate_Less) {
+
         cpu.reset();
         mem.write(0x8000, 0xE0);
         mem.write(0x8001, 0x50);
         cpu.X = 0x30;
         cpu.execute();
-        QCOMPARE(cpu.Z(), (Byte)0);
-        QCOMPARE(cpu.C(), (Byte)0);
-    }
+        EXPECT_EQ((Byte)0, cpu.Z());
+        EXPECT_EQ((Byte)0, cpu.C());
+}
 
-    void testCPX_ZeroPage() {
+TEST_F(CompareTest, testCPX_ZeroPage) {
+
         cpu.reset();
         mem.write(0x8000, 0xE4); // CPX zero page
         mem.write(0x8001, 0x10);
         mem.write(0x0010, 0x20);
         cpu.X = 0x30;
         cpu.execute();
-        QCOMPARE(cpu.C(), (Byte)1); // X >= M
-    }
+        EXPECT_EQ((Byte)1, cpu.C()); // X >= M
+}
 
-    void testCPX_Absolute() {
+TEST_F(CompareTest, testCPX_Absolute) {
+
         cpu.reset();
         mem.write(0x8000, 0xEC); // CPX absolute
         mem.write(0x8001, 0x00);
@@ -120,33 +123,35 @@ private slots:
         mem.write(0x2000, 0x40);
         cpu.X = 0x40;
         cpu.execute();
-        QCOMPARE(cpu.Z(), (Byte)1);
-        QCOMPARE(cpu.C(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)1, cpu.Z());
+        EXPECT_EQ((Byte)1, cpu.C());
+}
 
-    // CPY - Compare Y Register
-    void testCPY_Immediate_Equal() {
+TEST_F(CompareTest, testCPY_Immediate_Equal) {
+
         cpu.reset();
         mem.write(0x8000, 0xC0); // CPY immediate
         mem.write(0x8001, 0x55);
         cpu.Y = 0x55;
         cpu.execute();
-        QCOMPARE(cpu.Z(), (Byte)1);
-        QCOMPARE(cpu.C(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)1, cpu.Z());
+        EXPECT_EQ((Byte)1, cpu.C());
+}
 
-    void testCPY_ZeroPage() {
+TEST_F(CompareTest, testCPY_ZeroPage) {
+
         cpu.reset();
         mem.write(0x8000, 0xC4); // CPY zero page
         mem.write(0x8001, 0x10);
         mem.write(0x0010, 0x60);
         cpu.Y = 0x50;
         cpu.execute();
-        QCOMPARE(cpu.Z(), (Byte)0);
-        QCOMPARE(cpu.C(), (Byte)0); // Y < M
-    }
+        EXPECT_EQ((Byte)0, cpu.Z());
+        EXPECT_EQ((Byte)0, cpu.C()); // Y < M
+}
 
-    void testCPY_Absolute() {
+TEST_F(CompareTest, testCPY_Absolute) {
+
         cpu.reset();
         mem.write(0x8000, 0xCC); // CPY absolute
         mem.write(0x8001, 0x00);
@@ -154,6 +159,5 @@ private slots:
         mem.write(0x2000, 0x30);
         cpu.Y = 0x40;
         cpu.execute();
-        QCOMPARE(cpu.C(), (Byte)1); // Y >= M
-    }
-};
+        EXPECT_EQ((Byte)1, cpu.C()); // Y >= M
+}

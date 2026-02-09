@@ -1,152 +1,152 @@
-#pragma once
-
-#include <QtTest>
+#include <gtest/gtest.h>
 #include "../cpu.h"
 #include "../memory.h"
 
-class BranchTest : public QObject
-{
-    Q_OBJECT
-
+class BranchTest : public ::testing::Test {
+protected:
     Memory mem;
     CPU cpu;
 
-public:
     BranchTest()
         : mem()
         , cpu(&mem)
     {};
     ~BranchTest(){};
 
-private slots:
-    void initTestCase() {
+    void SetUp() override {
+
         mem.write(0xFFFC, 0x00);
         mem.write(0xFFFD, 0x80);
     }
+};
 
-    // BEQ - Branch if Equal (0xF0)
-    void testBEQ_Taken() {
+TEST_F(BranchTest, testBEQ_Taken) {
+
         cpu.reset();
         mem.write(0x8000, 0xF0); // BEQ
         mem.write(0x8001, 0x05); // offset +5
         cpu.setZ(true);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x8007); // 0x8002 + 0x05
-    }
+        EXPECT_EQ((Word)0x8007, cpu.PC); // 0x8002 + 0x05
+}
 
-    void testBEQ_NotTaken() {
+TEST_F(BranchTest, testBEQ_NotTaken) {
+
         cpu.reset();
         mem.write(0x8000, 0xF0);
         mem.write(0x8001, 0x05);
         cpu.setZ(false);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x8002); // No branch
-    }
+        EXPECT_EQ((Word)0x8002, cpu.PC); // No branch
+}
 
-    void testBEQ_Backward() {
+TEST_F(BranchTest, testBEQ_Backward) {
+
         cpu.reset();
         cpu.PC = 0x8010;
         mem.write(0x8010, 0xF0);
         mem.write(0x8011, 0xFA); // -6 in two's complement
         cpu.setZ(true);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x800C); // 0x8012 + (-6)
-    }
+        EXPECT_EQ((Word)0x800C, cpu.PC); // 0x8012 + (-6)
+}
 
-    // BNE - Branch if Not Equal (0xD0)
-    void testBNE_Taken() {
+TEST_F(BranchTest, testBNE_Taken) {
+
         cpu.reset();
         mem.write(0x8000, 0xD0);
         mem.write(0x8001, 0x10);
         cpu.setZ(false);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x8012);
-    }
+        EXPECT_EQ((Word)0x8012, cpu.PC);
+}
 
-    void testBNE_NotTaken() {
+TEST_F(BranchTest, testBNE_NotTaken) {
+
         cpu.reset();
         mem.write(0x8000, 0xD0);
         mem.write(0x8001, 0x10);
         cpu.setZ(true);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x8002);
-    }
+        EXPECT_EQ((Word)0x8002, cpu.PC);
+}
 
-    // BCC - Branch if Carry Clear (0x90)
-    void testBCC_Taken() {
+TEST_F(BranchTest, testBCC_Taken) {
+
         cpu.reset();
         mem.write(0x8000, 0x90);
         mem.write(0x8001, 0x08);
         cpu.setC(false);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x800A);
-    }
+        EXPECT_EQ((Word)0x800A, cpu.PC);
+}
 
-    void testBCC_NotTaken() {
+TEST_F(BranchTest, testBCC_NotTaken) {
+
         cpu.reset();
         mem.write(0x8000, 0x90);
         mem.write(0x8001, 0x08);
         cpu.setC(true);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x8002);
-    }
+        EXPECT_EQ((Word)0x8002, cpu.PC);
+}
 
-    // BCS - Branch if Carry Set (0xB0)
-    void testBCS_Taken() {
+TEST_F(BranchTest, testBCS_Taken) {
+
         cpu.reset();
         mem.write(0x8000, 0xB0);
         mem.write(0x8001, 0x04);
         cpu.setC(true);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x8006);
-    }
+        EXPECT_EQ((Word)0x8006, cpu.PC);
+}
 
-    // BMI - Branch if Minus (0x30)
-    void testBMI_Taken() {
+TEST_F(BranchTest, testBMI_Taken) {
+
         cpu.reset();
         mem.write(0x8000, 0x30);
         mem.write(0x8001, 0x02);
         cpu.setN(true);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x8004);
-    }
+        EXPECT_EQ((Word)0x8004, cpu.PC);
+}
 
-    void testBMI_NotTaken() {
+TEST_F(BranchTest, testBMI_NotTaken) {
+
         cpu.reset();
         mem.write(0x8000, 0x30);
         mem.write(0x8001, 0x02);
         cpu.setN(false);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x8002);
-    }
+        EXPECT_EQ((Word)0x8002, cpu.PC);
+}
 
-    // BPL - Branch if Plus (0x10)
-    void testBPL_Taken() {
+TEST_F(BranchTest, testBPL_Taken) {
+
         cpu.reset();
         mem.write(0x8000, 0x10);
         mem.write(0x8001, 0x03);
         cpu.setN(false);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x8005);
-    }
+        EXPECT_EQ((Word)0x8005, cpu.PC);
+}
 
-    // BVC - Branch if Overflow Clear (0x50)
-    void testBVC_Taken() {
+TEST_F(BranchTest, testBVC_Taken) {
+
         cpu.reset();
         mem.write(0x8000, 0x50);
         mem.write(0x8001, 0x07);
         cpu.setV(false);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x8009);
-    }
+        EXPECT_EQ((Word)0x8009, cpu.PC);
+}
 
-    // BVS - Branch if Overflow Set (0x70)
-    void testBVS_Taken() {
+TEST_F(BranchTest, testBVS_Taken) {
+
         cpu.reset();
         mem.write(0x8000, 0x70);
         mem.write(0x8001, 0x01);
         cpu.setV(true);
         cpu.execute();
-        QCOMPARE(cpu.PC, (Word)0x8003);
-    }
-};
+        EXPECT_EQ((Word)0x8003, cpu.PC);
+}

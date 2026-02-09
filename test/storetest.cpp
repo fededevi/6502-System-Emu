@@ -1,61 +1,60 @@
-#pragma once
-
-#include <QtTest>
+#include <gtest/gtest.h>
 #include "../cpu.h"
 #include "../memory.h"
 
-class StoreTest : public QObject
-{
-    Q_OBJECT
-
+class StoreTest : public ::testing::Test {
+protected:
     Memory mem;
     CPU cpu;
 
-public:
     StoreTest()
         : mem()
         , cpu(&mem)
     {};
     ~StoreTest(){};
 
-private slots:
-    void initTestCase() {
+    void SetUp() override {
+
         // Setup memory for tests
         mem.write(0xFFFC, 0x00);
         mem.write(0xFFFD, 0x80);
     }
+};
 
-    // STA Tests - Store Accumulator
-    void testSTAZeroPage() {
+TEST_F(StoreTest, testSTAZeroPage) {
+
         cpu.reset();
         cpu.A = 0x42;
         mem.write(0x8000, 0x85); // STA Zero Page (STAZ)
         mem.write(0x8001, 0x10); // Zero page address
         cpu.execute();
-        QCOMPARE(mem.read(0x0010), (Byte)0x42);
-    }
+        EXPECT_EQ((Byte)0x42, mem.read(0x0010));
+}
 
-    void testSTAZeroPageX() {
+TEST_F(StoreTest, testSTAZeroPageX) {
+
         cpu.reset();
         cpu.A = 0x55;
         cpu.X = 0x05;
         mem.write(0x8000, 0x95); // STA Zero Page,X (STAZX)
         mem.write(0x8001, 0x10); // Base address
         cpu.execute();
-        QCOMPARE(mem.read(0x0015), (Byte)0x55);
-    }
+        EXPECT_EQ((Byte)0x55, mem.read(0x0015));
+}
 
-    void testSTAAbsolute() {
+TEST_F(StoreTest, testSTAAbsolute) {
+
         cpu.reset();
         cpu.A = 0x77;
         mem.write(0x8000, 0x8D); // STA Absolute (STAA)
         mem.write(0x8001, 0x34);
         mem.write(0x8002, 0x12); // Address 0x1234
         cpu.execute();
-        QCOMPARE(mem.read(0x1234), (Byte)0x77);
-    }
+        EXPECT_EQ((Byte)0x77, mem.read(0x1234));
+}
 
-    void testSTAAbsoluteX() {
+TEST_F(StoreTest, testSTAAbsoluteX) {
+
         cpu.reset();
         cpu.A = 0x88;
         cpu.X = 0x02;
@@ -63,10 +62,11 @@ private slots:
         mem.write(0x8001, 0x00);
         mem.write(0x8002, 0x20); // Base 0x2000
         cpu.execute();
-        QCOMPARE(mem.read(0x2002), (Byte)0x88);
-    }
+        EXPECT_EQ((Byte)0x88, mem.read(0x2002));
+}
 
-    void testSTAAbsoluteY() {
+TEST_F(StoreTest, testSTAAbsoluteY) {
+
         cpu.reset();
         cpu.A = 0x99;
         cpu.Y = 0x03;
@@ -74,10 +74,11 @@ private slots:
         mem.write(0x8001, 0x00);
         mem.write(0x8002, 0x30); // Base 0x3000
         cpu.execute();
-        QCOMPARE(mem.read(0x3003), (Byte)0x99);
-    }
+        EXPECT_EQ((Byte)0x99, mem.read(0x3003));
+}
 
-    void testSTAIndirectX() {
+TEST_F(StoreTest, testSTAIndirectX) {
+
         cpu.reset();
         cpu.A = 0xAA;
         cpu.X = 0x04;
@@ -86,10 +87,11 @@ private slots:
         mem.write(0x0024, 0x00); // Low byte of target (0x20 + 0x04)
         mem.write(0x0025, 0x40); // High byte of target
         cpu.execute();
-        QCOMPARE(mem.read(0x4000), (Byte)0xAA);
-    }
+        EXPECT_EQ((Byte)0xAA, mem.read(0x4000));
+}
 
-    void testSTAIndirectY() {
+TEST_F(StoreTest, testSTAIndirectY) {
+
         cpu.reset();
         cpu.A = 0xBB;
         cpu.Y = 0x05;
@@ -98,66 +100,69 @@ private slots:
         mem.write(0x0030, 0x00); // Low byte of base
         mem.write(0x0031, 0x50); // High byte of base (0x5000)
         cpu.execute();
-        QCOMPARE(mem.read(0x5005), (Byte)0xBB);
-    }
+        EXPECT_EQ((Byte)0xBB, mem.read(0x5005));
+}
 
-    // STX Tests - Store X Register
-    void testSTXZeroPage() {
+TEST_F(StoreTest, testSTXZeroPage) {
+
         cpu.reset();
         cpu.X = 0x33;
         mem.write(0x8000, 0x86); // STX Zero Page (STXZP)
         mem.write(0x8001, 0x20);
         cpu.execute();
-        QCOMPARE(mem.read(0x0020), (Byte)0x33);
-    }
+        EXPECT_EQ((Byte)0x33, mem.read(0x0020));
+}
 
-    void testSTXZeroPageY() {
+TEST_F(StoreTest, testSTXZeroPageY) {
+
         cpu.reset();
         cpu.X = 0x44;
         cpu.Y = 0x03;
         mem.write(0x8000, 0x96); // STX Zero Page,Y (STXZPY)
         mem.write(0x8001, 0x20);
         cpu.execute();
-        QCOMPARE(mem.read(0x0023), (Byte)0x44);
-    }
+        EXPECT_EQ((Byte)0x44, mem.read(0x0023));
+}
 
-    void testSTXAbsolute() {
+TEST_F(StoreTest, testSTXAbsolute) {
+
         cpu.reset();
         cpu.X = 0x66;
         mem.write(0x8000, 0x8E); // STX Absolute (STXA)
         mem.write(0x8001, 0x00);
         mem.write(0x8002, 0x60);
         cpu.execute();
-        QCOMPARE(mem.read(0x6000), (Byte)0x66);
-    }
+        EXPECT_EQ((Byte)0x66, mem.read(0x6000));
+}
 
-    // STY Tests - Store Y Register
-    void testSTYZeroPage() {
+TEST_F(StoreTest, testSTYZeroPage) {
+
         cpu.reset();
         cpu.Y = 0x22;
         mem.write(0x8000, 0x84); // STY Zero Page (STYZP)
         mem.write(0x8001, 0x30);
         cpu.execute();
-        QCOMPARE(mem.read(0x0030), (Byte)0x22);
-    }
+        EXPECT_EQ((Byte)0x22, mem.read(0x0030));
+}
 
-    void testSTYZeroPageX() {
+TEST_F(StoreTest, testSTYZeroPageX) {
+
         cpu.reset();
         cpu.Y = 0x55;
         cpu.X = 0x04;
         mem.write(0x8000, 0x94); // STY Zero Page,X (STYZPX)
         mem.write(0x8001, 0x30);
         cpu.execute();
-        QCOMPARE(mem.read(0x0034), (Byte)0x55);
-    }
+        EXPECT_EQ((Byte)0x55, mem.read(0x0034));
+}
 
-    void testSTYAbsolute() {
+TEST_F(StoreTest, testSTYAbsolute) {
+
         cpu.reset();
         cpu.Y = 0x77;
         mem.write(0x8000, 0x8C); // STY Absolute (STYA)
         mem.write(0x8001, 0x00);
         mem.write(0x8002, 0x70);
         cpu.execute();
-        QCOMPARE(mem.read(0x7000), (Byte)0x77);
-    }
-};
+        EXPECT_EQ((Byte)0x77, mem.read(0x7000));
+}
