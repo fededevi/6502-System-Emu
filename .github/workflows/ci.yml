@@ -34,6 +34,21 @@ jobs:
         cd build
         ctest --output-on-failure
     
+    - name: Run Klaus Functional Test
+      run: |
+        cd build
+        output=$(./6502_emu -f ../test_programs/6502_functional_test.bin -a 0x0000 -pc 0x0400 -m 100000000 2>&1)
+        echo "$output"
+        # Check if the test passed (infinite loop at success address 0x3469)
+        if echo "$output" | grep -q "Infinite loop detected at PC=0x3469"; then
+          echo "✓ Klaus test PASSED"
+          exit 0
+        else
+          echo "✗ Klaus test FAILED"
+          echo "$output"
+          exit 1
+        fi
+    
     - name: Test Summary
       if: always()
       run: echo "Test execution completed"
