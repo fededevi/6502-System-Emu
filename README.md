@@ -1,5 +1,6 @@
 # 6502-System-Emu
 
+
 A comprehensive 6502 CPU emulator implementation with extensive testing capabilities.
 
 ## Features
@@ -10,8 +11,6 @@ A comprehensive 6502 CPU emulator implementation with extensive testing capabili
 - Industry-standard functional test programs integrated
 - Hexdump utilities for verification
 - Modern CMake build system
-
-## Building
 
 ### Prerequisites
 
