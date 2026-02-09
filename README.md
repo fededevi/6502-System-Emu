@@ -5,9 +5,54 @@ A comprehensive 6502 CPU emulator implementation with extensive testing capabili
 ## Features
 
 - Full 6502 instruction set implementation
+- Decimal mode (BCD) arithmetic support
 - Comprehensive unit tests for all instructions
 - Industry-standard functional test programs integrated
 - Hexdump utilities for verification
+- Modern CMake build system
+
+## Building
+
+### Prerequisites
+
+- CMake 3.14 or higher
+- C++17 compatible compiler (GCC, Clang, MSVC)
+- Qt5 (qtbase5-dev) for the test suite
+
+### Build Instructions
+
+```bash
+# Create build directory
+mkdir build
+cd build
+
+# Configure
+cmake ..
+
+# Build
+cmake --build .
+
+# Run tests
+ctest --output-on-failure
+```
+
+### Building with Different Generators
+
+CMake supports multiple build systems:
+
+```bash
+# Ninja (faster builds)
+cmake -G Ninja ..
+ninja
+
+# Make with verbose output
+cmake ..
+make VERBOSE=1
+
+# Visual Studio (Windows)
+cmake -G "Visual Studio 17 2022" ..
+cmake --build . --config Release
+```
 
 ## Project Structure
 
@@ -25,46 +70,55 @@ A comprehensive 6502 CPU emulator implementation with extensive testing capabili
   - Includes Klaus Dormann's functional test suite
   - See `test_programs/README.md` for details
 
-## Building
+## Running the Emulator
 
-### Main Emulator
-
-```bash
-qmake6 6502.pro
-make
-```
-
-### Unit Tests
+After building, run the emulator with:
 
 ```bash
-cd test
-qmake6 test.pro
-make
-./test
+./6502_emu
 ```
 
-### Test Runner (for binary test programs)
+## Testing
+
+This project includes multiple levels of testing:
+
+### 1. Unit Tests
+
+Run the test suite using CTest:
 
 ```bash
-./build_test_runner.sh
-./test_runner
+cd build
+ctest --output-on-failure
 ```
 
-Or manually:
+Or run the test executable directly:
 
 ```bash
-qmake6 test_runner.pro
-make
-./test_runner
+./test/6502_tests
 ```
 
-## Test Programs
+### 2. Functional Tests (Binary Test Programs)
 
 The `test_programs/` directory contains comprehensive binary test programs:
 
 - **6502_functional_test.bin** - Klaus Dormann's complete functional test
 - **Hexdump files** - For verification and debugging
 - **Listing files** - Assembly source with comments
+
+Build and run the test runner:
+
+```bash
+./build_test_runner.sh
+./test_runner
+```
+
+Or manually with qmake (if available):
+
+```bash
+qmake6 test_runner.pro
+make
+./test_runner
+```
 
 To verify test program integrity:
 
@@ -73,13 +127,29 @@ cd test_programs
 ./verify_tests.sh
 ```
 
-## Testing
+### 3. Hexdump Verification
 
-This project includes multiple levels of testing:
+Ensure test binaries are loaded correctly using the provided hexdump utilities.
 
-1. **Unit Tests** - Qt-based tests for individual instructions (`test/`)
-2. **Functional Tests** - Binary test programs that exercise the full CPU (`test_programs/`)
-3. **Hexdump Verification** - Ensure test binaries are loaded correctly
+## Legacy Build System
+
+The project previously used Qt's `.pro` files for building. These files are still present for backwards compatibility:
+
+### Main Emulator (Legacy)
+
+```bash
+qmake6 6502.pro
+make
+```
+
+### Unit Tests (Legacy)
+
+```bash
+cd test
+qmake6 test.pro
+make
+./test
+```
 
 ## Resources
 

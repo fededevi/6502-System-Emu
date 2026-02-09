@@ -183,4 +183,78 @@ private slots:
         cpu.execute();
         QCOMPARE(cpu.A, (Byte)0x39);
     }
+
+    // Decimal Mode Tests
+    void testADCDecimalModeBasic() {
+        cpu.reset();
+        cpu.A = 0x09; // 9 in BCD
+        cpu.setC(false);
+        cpu.setD(true); // Enable decimal mode
+        mem.write(0x8000, 0x69); // ADC Immediate
+        mem.write(0x8001, 0x01); // 1 in BCD
+        cpu.execute();
+        QCOMPARE(cpu.A, (Byte)0x10); // 9 + 1 = 10 in BCD
+        QCOMPARE(cpu.C(), (Byte)0); // No decimal carry
+    }
+
+    void testADCDecimalModeWithCarry() {
+        cpu.reset();
+        cpu.A = 0x08; // 8 in BCD
+        cpu.setC(true);
+        cpu.setD(true);
+        mem.write(0x8000, 0x69); // ADC Immediate
+        mem.write(0x8001, 0x05); // 5 in BCD
+        cpu.execute();
+        QCOMPARE(cpu.A, (Byte)0x14); // 8 + 5 + 1 = 14 in BCD
+        QCOMPARE(cpu.C(), (Byte)0);
+    }
+
+    void testADCDecimalModeCarryOut() {
+        cpu.reset();
+        cpu.A = 0x99; // 99 in BCD
+        cpu.setC(false);
+        cpu.setD(true);
+        mem.write(0x8000, 0x69); // ADC Immediate
+        mem.write(0x8001, 0x01); // 1 in BCD
+        cpu.execute();
+        QCOMPARE(cpu.A, (Byte)0x00); // 99 + 1 = 100, wraps to 00
+        QCOMPARE(cpu.C(), (Byte)1); // Carry set (result > 99)
+    }
+
+    void testADCDecimalModeMultipleDigits() {
+        cpu.reset();
+        cpu.A = 0x25; // 25 in BCD
+        cpu.setC(false);
+        cpu.setD(true);
+        mem.write(0x8000, 0x69); // ADC Immediate
+        mem.write(0x8001, 0x34); // 34 in BCD
+        cpu.execute();
+        QCOMPARE(cpu.A, (Byte)0x59); // 25 + 34 = 59 in BCD
+        QCOMPARE(cpu.C(), (Byte)0);
+    }
+
+    void testADCDecimalModeWithNibbleCarry() {
+        cpu.reset();
+        cpu.A = 0x19; // 19 in BCD
+        cpu.setC(false);
+        cpu.setD(true);
+        mem.write(0x8000, 0x69); // ADC Immediate
+        mem.write(0x8001, 0x22); // 22 in BCD
+        cpu.execute();
+        QCOMPARE(cpu.A, (Byte)0x41); // 19 + 22 = 41 in BCD
+        QCOMPARE(cpu.C(), (Byte)0);
+    }
+
+    void testADCDecimalModeZeroPage() {
+        cpu.reset();
+        cpu.A = 0x15; // 15 in BCD
+        cpu.setC(false);
+        cpu.setD(true);
+        mem.write(0x8000, 0x65); // ADC Zero Page
+        mem.write(0x8001, 0x10);
+        mem.write(0x0010, 0x25); // 25 in BCD
+        cpu.execute();
+        QCOMPARE(cpu.A, (Byte)0x40); // 15 + 25 = 40 in BCD
+        QCOMPARE(cpu.C(), (Byte)0); // No carry
+    }
 };
