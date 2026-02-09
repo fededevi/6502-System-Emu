@@ -124,7 +124,7 @@ These serve multiple purposes:
 - CMakeLists.txt (integrated test_runner and verify_tests.sh as CTest targets)
 - TESTING_GUIDE.md (updated to use CMake/CTest commands)
 - IMPLEMENTATION_SUMMARY.md (updated build instructions)
-- .gitignore (allow Makefile.test_runner, exclude test_runner binary)
+- .gitignore (updated to remove Makefile.test_runner exception)
 - memory.h (added writeBlock method)
 - memory.cpp (implemented writeBlock)
 - transfer.cpp (added SetNZ forward declaration)
