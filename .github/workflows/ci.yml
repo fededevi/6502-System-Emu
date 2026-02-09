@@ -13,21 +13,26 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Install Qt
+    - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y qt6-base-dev qt6-base-dev-tools libqt6test6
+        sudo apt-get install -y cmake build-essential
     
-    - name: Build Tests
+    - name: Configure CMake
       run: |
-        cd test
-        qmake6 test.pro
-        make
+        mkdir -p build
+        cd build
+        cmake ..
+    
+    - name: Build
+      run: |
+        cd build
+        cmake --build .
     
     - name: Run Tests
       run: |
-        cd test
-        ./test
+        cd build
+        ctest --output-on-failure
     
     - name: Test Summary
       if: always()
