@@ -1,78 +1,78 @@
-#pragma once
-
-#include <QtTest>
+#include <gtest/gtest.h>
 #include "../cpu.h"
 #include "../memory.h"
 
-class SubtractTest : public QObject
-{
-    Q_OBJECT
-
+class SubtractTest : public ::testing::Test {
+protected:
     Memory mem;
     CPU cpu;
 
-public:
     SubtractTest()
         : mem()
         , cpu(&mem)
     {};
     ~SubtractTest(){};
 
-private slots:
-    void initTestCase() {
+    void SetUp() override {
+
         mem.write(0xFFFC, 0x00);
         mem.write(0xFFFD, 0x80);
     }
+};
 
-    // SBC - Subtract with Carry
-    void testSBC_Immediate_NoCarry() {
+TEST_F(SubtractTest, testSBC_Immediate_NoCarry) {
+
         cpu.reset();
         mem.write(0x8000, 0xE9); // SBC immediate
         mem.write(0x8001, 0x01);
         cpu.A = 0x05;
         cpu.setC(true); // No borrow
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x04);
-        QCOMPARE(cpu.C(), (Byte)1); // No borrow occurred
-        QCOMPARE(cpu.Z(), (Byte)0);
-        QCOMPARE(cpu.N(), (Byte)0);
-    }
+        EXPECT_EQ((Byte)0x04, cpu.A);
+        EXPECT_EQ((Byte)1, cpu.C()); // No borrow occurred
+        EXPECT_EQ((Byte)0, cpu.Z());
+        EXPECT_EQ((Byte)0, cpu.N());
+}
 
-    void testSBC_Immediate_WithBorrow() {
+TEST_F(SubtractTest, testSBC_Immediate_WithBorrow) {
+
         cpu.reset();
         mem.write(0x8000, 0xE9);
         mem.write(0x8001, 0x01);
         cpu.A = 0x05;
         cpu.setC(false); // Borrow
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x03); // 5 - 1 - 1 = 3
-        QCOMPARE(cpu.C(), (Byte)1); // No borrow in result
-    }
+        EXPECT_EQ((Byte)0x03, cpu.A); // 5 - 1 - 1 = 3
+        EXPECT_EQ((Byte)1, cpu.C()); // No borrow in result
+}
 
-    void testSBC_Immediate_Zero() {
+TEST_F(SubtractTest, testSBC_Immediate_Zero) {
+
         cpu.reset();
         mem.write(0x8000, 0xE9);
         mem.write(0x8001, 0x42);
         cpu.A = 0x42;
         cpu.setC(true);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x00);
-        QCOMPARE(cpu.Z(), (Byte)1); // Zero flag set
-    }
+        EXPECT_EQ((Byte)0x00, cpu.A);
+        EXPECT_EQ((Byte)1, cpu.Z()); // Zero flag set
+}
 
-    void testSBC_Immediate_Negative() {
+TEST_F(SubtractTest, testSBC_Immediate_Negative) {
+
         cpu.reset();
         mem.write(0x8000, 0xE9);
         mem.write(0x8001, 0x50);
         cpu.A = 0x30;
         cpu.setC(true);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0xE0); // 48 - 80 = -32 = 0xE0
-        QCOMPARE(cpu.N(), (Byte)1); // Negative
-        QCOMPARE(cpu.C(), (Byte)0); // Borrow occurred
-    }
+        EXPECT_EQ((Byte)0xE0, cpu.A); // 48 - 80 = -32 = 0xE0
+        EXPECT_EQ((Byte)1, cpu.N()); // Negative
+        EXPECT_EQ((Byte)0, cpu.C()); // Borrow occurred
+}
 
-    void testSBC_ZeroPage() {
+TEST_F(SubtractTest, testSBC_ZeroPage) {
+
         cpu.reset();
         mem.write(0x8000, 0xE5); // SBC zero page
         mem.write(0x8001, 0x10);
@@ -80,11 +80,12 @@ private slots:
         cpu.A = 0x50;
         cpu.setC(true);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x30); // 80 - 32 = 48
-        QCOMPARE(cpu.C(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)0x30, cpu.A); // 80 - 32 = 48
+        EXPECT_EQ((Byte)1, cpu.C());
+}
 
-    void testSBC_ZeroPageX() {
+TEST_F(SubtractTest, testSBC_ZeroPageX) {
+
         cpu.reset();
         mem.write(0x8000, 0xF5); // SBC zero page,X
         mem.write(0x8001, 0x10);
@@ -93,10 +94,11 @@ private slots:
         cpu.X = 0x05;
         cpu.setC(true);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x20);
-    }
+        EXPECT_EQ((Byte)0x20, cpu.A);
+}
 
-    void testSBC_Absolute() {
+TEST_F(SubtractTest, testSBC_Absolute) {
+
         cpu.reset();
         mem.write(0x8000, 0xED); // SBC absolute
         mem.write(0x8001, 0x00);
@@ -105,10 +107,11 @@ private slots:
         cpu.A = 0x25;
         cpu.setC(true);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x10); // 37 - 21 = 16
-    }
+        EXPECT_EQ((Byte)0x10, cpu.A); // 37 - 21 = 16
+}
 
-    void testSBC_AbsoluteX() {
+TEST_F(SubtractTest, testSBC_AbsoluteX) {
+
         cpu.reset();
         mem.write(0x8000, 0xFD); // SBC absolute,X
         mem.write(0x8001, 0x00);
@@ -118,10 +121,11 @@ private slots:
         cpu.X = 0x05;
         cpu.setC(true);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x10);
-    }
+        EXPECT_EQ((Byte)0x10, cpu.A);
+}
 
-    void testSBC_AbsoluteY() {
+TEST_F(SubtractTest, testSBC_AbsoluteY) {
+
         cpu.reset();
         mem.write(0x8000, 0xF9); // SBC absolute,Y
         mem.write(0x8001, 0x00);
@@ -131,10 +135,11 @@ private slots:
         cpu.Y = 0x03;
         cpu.setC(true);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x10);
-    }
+        EXPECT_EQ((Byte)0x10, cpu.A);
+}
 
-    void testSBC_IndirectX() {
+TEST_F(SubtractTest, testSBC_IndirectX) {
+
         cpu.reset();
         mem.write(0x8000, 0xE1); // SBC (indirect,X)
         mem.write(0x8001, 0x10);
@@ -145,10 +150,11 @@ private slots:
         cpu.X = 0x05;
         cpu.setC(true);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x20); // 50 - 18 = 32
-    }
+        EXPECT_EQ((Byte)0x20, cpu.A); // 50 - 18 = 32
+}
 
-    void testSBC_IndirectY() {
+TEST_F(SubtractTest, testSBC_IndirectY) {
+
         cpu.reset();
         mem.write(0x8000, 0xF1); // SBC (indirect),Y
         mem.write(0x8001, 0x10);
@@ -159,11 +165,11 @@ private slots:
         cpu.Y = 0x04;
         cpu.setC(true);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x20); // 52 - 20 = 32
-    }
+        EXPECT_EQ((Byte)0x20, cpu.A); // 52 - 20 = 32
+}
 
-    // Decimal Mode Tests
-    void testSBCDecimalModeBasic() {
+TEST_F(SubtractTest, testSBCDecimalModeBasic) {
+
         cpu.reset();
         cpu.A = 0x50; // 50 in BCD
         cpu.setC(true); // No borrow
@@ -171,11 +177,12 @@ private slots:
         mem.write(0x8000, 0xE9); // SBC Immediate
         mem.write(0x8001, 0x25); // 25 in BCD
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x25); // 50 - 25 = 25 in BCD
-        QCOMPARE(cpu.C(), (Byte)1); // No borrow
-    }
+        EXPECT_EQ((Byte)0x25, cpu.A); // 50 - 25 = 25 in BCD
+        EXPECT_EQ((Byte)1, cpu.C()); // No borrow
+}
 
-    void testSBCDecimalModeWithBorrow() {
+TEST_F(SubtractTest, testSBCDecimalModeWithBorrow) {
+
         cpu.reset();
         cpu.A = 0x50; // 50 in BCD
         cpu.setC(false); // Borrow
@@ -183,11 +190,12 @@ private slots:
         mem.write(0x8000, 0xE9); // SBC Immediate
         mem.write(0x8001, 0x25); // 25 in BCD
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x24); // 50 - 25 - 1 = 24 in BCD
-        QCOMPARE(cpu.C(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)0x24, cpu.A); // 50 - 25 - 1 = 24 in BCD
+        EXPECT_EQ((Byte)1, cpu.C());
+}
 
-    void testSBCDecimalModeNeedsBorrow() {
+TEST_F(SubtractTest, testSBCDecimalModeNeedsBorrow) {
+
         cpu.reset();
         cpu.A = 0x32; // 32 in BCD
         cpu.setC(true);
@@ -195,11 +203,12 @@ private slots:
         mem.write(0x8000, 0xE9); // SBC Immediate
         mem.write(0x8001, 0x04); // 4 in BCD
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x28); // 32 - 4 = 28 in BCD
-        QCOMPARE(cpu.C(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)0x28, cpu.A); // 32 - 4 = 28 in BCD
+        EXPECT_EQ((Byte)1, cpu.C());
+}
 
-    void testSBCDecimalModeZeroResult() {
+TEST_F(SubtractTest, testSBCDecimalModeZeroResult) {
+
         cpu.reset();
         cpu.A = 0x25; // 25 in BCD
         cpu.setC(true);
@@ -207,12 +216,13 @@ private slots:
         mem.write(0x8000, 0xE9); // SBC Immediate
         mem.write(0x8001, 0x25); // 25 in BCD
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x00); // 25 - 25 = 0
-        QCOMPARE(cpu.Z(), (Byte)1); // Zero flag set
-        QCOMPARE(cpu.C(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)0x00, cpu.A); // 25 - 25 = 0
+        EXPECT_EQ((Byte)1, cpu.Z()); // Zero flag set
+        EXPECT_EQ((Byte)1, cpu.C());
+}
 
-    void testSBCDecimalModeCrossNibble() {
+TEST_F(SubtractTest, testSBCDecimalModeCrossNibble) {
+
         cpu.reset();
         cpu.A = 0x46; // 46 in BCD
         cpu.setC(true);
@@ -220,11 +230,12 @@ private slots:
         mem.write(0x8000, 0xE9); // SBC Immediate
         mem.write(0x8001, 0x08); // 8 in BCD
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x38); // 46 - 8 = 38 in BCD
-        QCOMPARE(cpu.C(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)0x38, cpu.A); // 46 - 8 = 38 in BCD
+        EXPECT_EQ((Byte)1, cpu.C());
+}
 
-    void testSBCDecimalModeZeroPage() {
+TEST_F(SubtractTest, testSBCDecimalModeZeroPage) {
+
         cpu.reset();
         cpu.A = 0x75; // 75 in BCD
         cpu.setC(true);
@@ -233,7 +244,6 @@ private slots:
         mem.write(0x8001, 0x10);
         mem.write(0x0010, 0x30); // 30 in BCD
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x45); // 75 - 30 = 45 in BCD
-        QCOMPARE(cpu.C(), (Byte)1);
-    }
-};
+        EXPECT_EQ((Byte)0x45, cpu.A); // 75 - 30 = 45 in BCD
+        EXPECT_EQ((Byte)1, cpu.C());
+}

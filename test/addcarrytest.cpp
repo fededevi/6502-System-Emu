@@ -1,101 +1,102 @@
-#pragma once
-
-#include <QtTest>
+#include <gtest/gtest.h>
 #include "../cpu.h"
 #include "../memory.h"
 
-class AddCarryTest : public QObject
-{
-    Q_OBJECT
-
+class AddCarryTest : public ::testing::Test {
+protected:
     Memory mem;
     CPU cpu;
 
-public:
     AddCarryTest()
         : mem()
         , cpu(&mem)
     {};
     ~AddCarryTest(){};
 
-private slots:
-    void initTestCase() {
+    void SetUp() override {
+
         mem.write(0xFFFC, 0x00);
         mem.write(0xFFFD, 0x80);
     }
+};
 
-    // Basic ADC tests
-    void testADCImmediateBasic() {
+TEST_F(AddCarryTest, testADCImmediateBasic) {
+
         cpu.reset();
         cpu.A = 0x10;
         cpu.setC(false);
         mem.write(0x8000, 0x69); // ADC Immediate (ADCI)
         mem.write(0x8001, 0x20);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x30);
-        QCOMPARE(cpu.C(), (Byte)0); // No carry
-        QCOMPARE(cpu.Z(), (Byte)0); // Not zero
-        QCOMPARE(cpu.N(), (Byte)0); // Not negative
-    }
+        EXPECT_EQ((Byte)0x30, cpu.A);
+        EXPECT_EQ((Byte)0, cpu.C()); // No carry
+        EXPECT_EQ((Byte)0, cpu.Z()); // Not zero
+        EXPECT_EQ((Byte)0, cpu.N()); // Not negative
+}
 
-    void testADCImmediateWithCarry() {
+TEST_F(AddCarryTest, testADCImmediateWithCarry) {
+
         cpu.reset();
         cpu.A = 0x10;
         cpu.setC(true); // Set carry flag
         mem.write(0x8000, 0x69); // ADC Immediate
         mem.write(0x8001, 0x20);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x31); // 0x10 + 0x20 + 1
-        QCOMPARE(cpu.C(), (Byte)0);
-    }
+        EXPECT_EQ((Byte)0x31, cpu.A); // 0x10 + 0x20 + 1
+        EXPECT_EQ((Byte)0, cpu.C());
+}
 
-    void testADCImmediateCarryOut() {
+TEST_F(AddCarryTest, testADCImmediateCarryOut) {
+
         cpu.reset();
         cpu.A = 0xFF;
         cpu.setC(false);
         mem.write(0x8000, 0x69); // ADC Immediate
         mem.write(0x8001, 0x01);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x00); // Wraps around
-        QCOMPARE(cpu.C(), (Byte)1); // Carry set
-        QCOMPARE(cpu.Z(), (Byte)1); // Zero flag set
-    }
+        EXPECT_EQ((Byte)0x00, cpu.A); // Wraps around
+        EXPECT_EQ((Byte)1, cpu.C()); // Carry set
+        EXPECT_EQ((Byte)1, cpu.Z()); // Zero flag set
+}
 
-    void testADCImmediateNegativeFlag() {
+TEST_F(AddCarryTest, testADCImmediateNegativeFlag) {
+
         cpu.reset();
         cpu.A = 0x50;
         cpu.setC(false);
         mem.write(0x8000, 0x69); // ADC Immediate
         mem.write(0x8001, 0x50);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0xA0); // 0x50 + 0x50 = 0xA0
-        QCOMPARE(cpu.N(), (Byte)1); // Negative flag set (bit 7 is 1)
-    }
+        EXPECT_EQ((Byte)0xA0, cpu.A); // 0x50 + 0x50 = 0xA0
+        EXPECT_EQ((Byte)1, cpu.N()); // Negative flag set (bit 7 is 1)
+}
 
-    void testADCImmediateOverflow() {
+TEST_F(AddCarryTest, testADCImmediateOverflow) {
+
         cpu.reset();
         cpu.A = 0x50; // Positive
         cpu.setC(false);
         mem.write(0x8000, 0x69); // ADC Immediate
         mem.write(0x8001, 0x50); // Positive
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0xA0); // Result appears negative
-        QCOMPARE(cpu.V(), (Byte)1); // Overflow flag set
-    }
+        EXPECT_EQ((Byte)0xA0, cpu.A); // Result appears negative
+        EXPECT_EQ((Byte)1, cpu.V()); // Overflow flag set
+}
 
-    void testADCImmediateNoOverflow() {
+TEST_F(AddCarryTest, testADCImmediateNoOverflow) {
+
         cpu.reset();
         cpu.A = 0x50; // Positive
         cpu.setC(false);
         mem.write(0x8000, 0x69); // ADC Immediate
         mem.write(0x8001, 0x10); // Positive, result positive
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x60);
-        QCOMPARE(cpu.V(), (Byte)0); // No overflow
-    }
+        EXPECT_EQ((Byte)0x60, cpu.A);
+        EXPECT_EQ((Byte)0, cpu.V()); // No overflow
+}
 
-    // Test other addressing modes
-    void testADCZeroPage() {
+TEST_F(AddCarryTest, testADCZeroPage) {
+
         cpu.reset();
         cpu.A = 0x15;
         cpu.setC(false);
@@ -103,10 +104,11 @@ private slots:
         mem.write(0x8001, 0x10);
         mem.write(0x0010, 0x25);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x3A);
-    }
+        EXPECT_EQ((Byte)0x3A, cpu.A);
+}
 
-    void testADCZeroPageX() {
+TEST_F(AddCarryTest, testADCZeroPageX) {
+
         cpu.reset();
         cpu.A = 0x20;
         cpu.X = 0x05;
@@ -115,10 +117,11 @@ private slots:
         mem.write(0x8001, 0x10);
         mem.write(0x0015, 0x30);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x50);
-    }
+        EXPECT_EQ((Byte)0x50, cpu.A);
+}
 
-    void testADCAbsolute() {
+TEST_F(AddCarryTest, testADCAbsolute) {
+
         cpu.reset();
         cpu.A = 0x40;
         cpu.setC(false);
@@ -127,10 +130,11 @@ private slots:
         mem.write(0x8002, 0x12);
         mem.write(0x1234, 0x05);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x45);
-    }
+        EXPECT_EQ((Byte)0x45, cpu.A);
+}
 
-    void testADCAbsoluteX() {
+TEST_F(AddCarryTest, testADCAbsoluteX) {
+
         cpu.reset();
         cpu.A = 0x11;
         cpu.X = 0x02;
@@ -140,10 +144,11 @@ private slots:
         mem.write(0x8002, 0x20);
         mem.write(0x2002, 0x22);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x33);
-    }
+        EXPECT_EQ((Byte)0x33, cpu.A);
+}
 
-    void testADCAbsoluteY() {
+TEST_F(AddCarryTest, testADCAbsoluteY) {
+
         cpu.reset();
         cpu.A = 0x12;
         cpu.Y = 0x03;
@@ -153,10 +158,11 @@ private slots:
         mem.write(0x8002, 0x30);
         mem.write(0x3003, 0x23);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x35);
-    }
+        EXPECT_EQ((Byte)0x35, cpu.A);
+}
 
-    void testADCIndirectX() {
+TEST_F(AddCarryTest, testADCIndirectX) {
+
         cpu.reset();
         cpu.A = 0x13;
         cpu.X = 0x04;
@@ -167,10 +173,11 @@ private slots:
         mem.write(0x0025, 0x40);
         mem.write(0x4000, 0x24);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x37);
-    }
+        EXPECT_EQ((Byte)0x37, cpu.A);
+}
 
-    void testADCIndirectY() {
+TEST_F(AddCarryTest, testADCIndirectY) {
+
         cpu.reset();
         cpu.A = 0x14;
         cpu.Y = 0x05;
@@ -181,11 +188,11 @@ private slots:
         mem.write(0x0031, 0x50);
         mem.write(0x5005, 0x25);
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x39);
-    }
+        EXPECT_EQ((Byte)0x39, cpu.A);
+}
 
-    // Decimal Mode Tests
-    void testADCDecimalModeBasic() {
+TEST_F(AddCarryTest, testADCDecimalModeBasic) {
+
         cpu.reset();
         cpu.A = 0x09; // 9 in BCD
         cpu.setC(false);
@@ -193,11 +200,12 @@ private slots:
         mem.write(0x8000, 0x69); // ADC Immediate
         mem.write(0x8001, 0x01); // 1 in BCD
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x10); // 9 + 1 = 10 in BCD
-        QCOMPARE(cpu.C(), (Byte)0); // No decimal carry
-    }
+        EXPECT_EQ((Byte)0x10, cpu.A); // 9 + 1 = 10 in BCD
+        EXPECT_EQ((Byte)0, cpu.C()); // No decimal carry
+}
 
-    void testADCDecimalModeWithCarry() {
+TEST_F(AddCarryTest, testADCDecimalModeWithCarry) {
+
         cpu.reset();
         cpu.A = 0x08; // 8 in BCD
         cpu.setC(true);
@@ -205,11 +213,12 @@ private slots:
         mem.write(0x8000, 0x69); // ADC Immediate
         mem.write(0x8001, 0x05); // 5 in BCD
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x14); // 8 + 5 + 1 = 14 in BCD
-        QCOMPARE(cpu.C(), (Byte)0);
-    }
+        EXPECT_EQ((Byte)0x14, cpu.A); // 8 + 5 + 1 = 14 in BCD
+        EXPECT_EQ((Byte)0, cpu.C());
+}
 
-    void testADCDecimalModeCarryOut() {
+TEST_F(AddCarryTest, testADCDecimalModeCarryOut) {
+
         cpu.reset();
         cpu.A = 0x99; // 99 in BCD
         cpu.setC(false);
@@ -217,11 +226,12 @@ private slots:
         mem.write(0x8000, 0x69); // ADC Immediate
         mem.write(0x8001, 0x01); // 1 in BCD
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x00); // 99 + 1 = 100, wraps to 00
-        QCOMPARE(cpu.C(), (Byte)1); // Carry set (result > 99)
-    }
+        EXPECT_EQ((Byte)0x00, cpu.A); // 99 + 1 = 100, wraps to 00
+        EXPECT_EQ((Byte)1, cpu.C()); // Carry set (result > 99)
+}
 
-    void testADCDecimalModeMultipleDigits() {
+TEST_F(AddCarryTest, testADCDecimalModeMultipleDigits) {
+
         cpu.reset();
         cpu.A = 0x25; // 25 in BCD
         cpu.setC(false);
@@ -229,11 +239,12 @@ private slots:
         mem.write(0x8000, 0x69); // ADC Immediate
         mem.write(0x8001, 0x34); // 34 in BCD
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x59); // 25 + 34 = 59 in BCD
-        QCOMPARE(cpu.C(), (Byte)0);
-    }
+        EXPECT_EQ((Byte)0x59, cpu.A); // 25 + 34 = 59 in BCD
+        EXPECT_EQ((Byte)0, cpu.C());
+}
 
-    void testADCDecimalModeWithNibbleCarry() {
+TEST_F(AddCarryTest, testADCDecimalModeWithNibbleCarry) {
+
         cpu.reset();
         cpu.A = 0x19; // 19 in BCD
         cpu.setC(false);
@@ -241,11 +252,12 @@ private slots:
         mem.write(0x8000, 0x69); // ADC Immediate
         mem.write(0x8001, 0x22); // 22 in BCD
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x41); // 19 + 22 = 41 in BCD
-        QCOMPARE(cpu.C(), (Byte)0);
-    }
+        EXPECT_EQ((Byte)0x41, cpu.A); // 19 + 22 = 41 in BCD
+        EXPECT_EQ((Byte)0, cpu.C());
+}
 
-    void testADCDecimalModeZeroPage() {
+TEST_F(AddCarryTest, testADCDecimalModeZeroPage) {
+
         cpu.reset();
         cpu.A = 0x15; // 15 in BCD
         cpu.setC(false);
@@ -254,7 +266,6 @@ private slots:
         mem.write(0x8001, 0x10);
         mem.write(0x0010, 0x25); // 25 in BCD
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x40); // 15 + 25 = 40 in BCD
-        QCOMPARE(cpu.C(), (Byte)0); // No carry
-    }
-};
+        EXPECT_EQ((Byte)0x40, cpu.A); // 15 + 25 = 40 in BCD
+        EXPECT_EQ((Byte)0, cpu.C()); // No carry
+}

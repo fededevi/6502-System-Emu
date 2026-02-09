@@ -1,62 +1,61 @@
-#pragma once
-
-#include <QtTest>
+#include <gtest/gtest.h>
 #include "../cpu.h"
 #include "../memory.h"
 
-class LogicalTest : public QObject
-{
-    Q_OBJECT
-
+class LogicalTest : public ::testing::Test {
+protected:
     Memory mem;
     CPU cpu;
 
-public:
     LogicalTest()
         : mem()
         , cpu(&mem)
     {};
     ~LogicalTest(){};
 
-private slots:
-    void initTestCase() {
+    void SetUp() override {
+
         mem.write(0xFFFC, 0x00);
         mem.write(0xFFFD, 0x80);
     }
+};
 
-    // AND - Logical AND
-    void testAND_Immediate() {
+TEST_F(LogicalTest, testAND_Immediate) {
+
         cpu.reset();
         mem.write(0x8000, 0x29); // AND immediate
         mem.write(0x8001, 0x0F);
         cpu.A = 0xFF;
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x0F);
-        QCOMPARE(cpu.Z(), (Byte)0);
-        QCOMPARE(cpu.N(), (Byte)0);
-    }
+        EXPECT_EQ((Byte)0x0F, cpu.A);
+        EXPECT_EQ((Byte)0, cpu.Z());
+        EXPECT_EQ((Byte)0, cpu.N());
+}
 
-    void testAND_ZeroResult() {
+TEST_F(LogicalTest, testAND_ZeroResult) {
+
         cpu.reset();
         mem.write(0x8000, 0x29);
         mem.write(0x8001, 0x00);
         cpu.A = 0xFF;
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x00);
-        QCOMPARE(cpu.Z(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)0x00, cpu.A);
+        EXPECT_EQ((Byte)1, cpu.Z());
+}
 
-    void testAND_ZeroPage() {
+TEST_F(LogicalTest, testAND_ZeroPage) {
+
         cpu.reset();
         mem.write(0x8000, 0x25); // AND zero page
         mem.write(0x8001, 0x10);
         mem.write(0x0010, 0x55);
         cpu.A = 0xAA;
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x00);
-    }
+        EXPECT_EQ((Byte)0x00, cpu.A);
+}
 
-    void testAND_Absolute() {
+TEST_F(LogicalTest, testAND_Absolute) {
+
         cpu.reset();
         mem.write(0x8000, 0x2D); // AND absolute
         mem.write(0x8001, 0x00);
@@ -64,31 +63,33 @@ private slots:
         mem.write(0x2000, 0xF0);
         cpu.A = 0xFF;
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0xF0);
-    }
+        EXPECT_EQ((Byte)0xF0, cpu.A);
+}
 
-    // ORA - Logical OR
-    void testORA_Immediate() {
+TEST_F(LogicalTest, testORA_Immediate) {
+
         cpu.reset();
         mem.write(0x8000, 0x09); // ORA immediate
         mem.write(0x8001, 0xF0);
         cpu.A = 0x0F;
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0xFF);
-        QCOMPARE(cpu.N(), (Byte)1);
-    }
+        EXPECT_EQ((Byte)0xFF, cpu.A);
+        EXPECT_EQ((Byte)1, cpu.N());
+}
 
-    void testORA_ZeroPage() {
+TEST_F(LogicalTest, testORA_ZeroPage) {
+
         cpu.reset();
         mem.write(0x8000, 0x05); // ORA zero page
         mem.write(0x8001, 0x10);
         mem.write(0x0010, 0x55);
         cpu.A = 0xAA;
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0xFF);
-    }
+        EXPECT_EQ((Byte)0xFF, cpu.A);
+}
 
-    void testORA_Absolute() {
+TEST_F(LogicalTest, testORA_Absolute) {
+
         cpu.reset();
         mem.write(0x8000, 0x0D); // ORA absolute
         mem.write(0x8001, 0x00);
@@ -96,36 +97,37 @@ private slots:
         mem.write(0x2000, 0x0F);
         cpu.A = 0x00;
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x0F);
-    }
+        EXPECT_EQ((Byte)0x0F, cpu.A);
+}
 
-    // EOR - Exclusive OR
-    void testEOR_Immediate() {
+TEST_F(LogicalTest, testEOR_Immediate) {
+
         cpu.reset();
         mem.write(0x8000, 0x49); // EOR immediate
         mem.write(0x8001, 0xFF);
         cpu.A = 0xAA;
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x55);
-    }
+        EXPECT_EQ((Byte)0x55, cpu.A);
+}
 
-    void testEOR_ZeroPage() {
+TEST_F(LogicalTest, testEOR_ZeroPage) {
+
         cpu.reset();
         mem.write(0x8000, 0x45); // EOR zero page
         mem.write(0x8001, 0x10);
         mem.write(0x0010, 0x0F);
         cpu.A = 0xFF;
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0xF0);
-    }
+        EXPECT_EQ((Byte)0xF0, cpu.A);
+}
 
-    void testEOR_SelfCancel() {
+TEST_F(LogicalTest, testEOR_SelfCancel) {
+
         cpu.reset();
         mem.write(0x8000, 0x49); // EOR immediate
         mem.write(0x8001, 0x42);
         cpu.A = 0x42;
         cpu.execute();
-        QCOMPARE(cpu.A, (Byte)0x00);
-        QCOMPARE(cpu.Z(), (Byte)1);
-    }
-};
+        EXPECT_EQ((Byte)0x00, cpu.A);
+        EXPECT_EQ((Byte)1, cpu.Z());
+}
