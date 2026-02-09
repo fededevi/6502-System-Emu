@@ -15,6 +15,94 @@ protected:
 
 };
 
+TEST_F(CpuTest, resetTest) {
+    cpu.reset();
+    EXPECT_EQ(0, cpu.P);
+    EXPECT_EQ(0, cpu.A);
+    EXPECT_EQ(0, cpu.X);
+    EXPECT_EQ(0, cpu.Y);
+    EXPECT_EQ(mem.read16(0xFFFC), cpu.PC);
+    EXPECT_EQ(0xFD, cpu.SP);
+    EXPECT_EQ(7, cpu.cycles);
+}
+
+TEST_F(CpuTest, immediateTest) {
+    cpu.reset();
+    Word addr = cpu.PC;
+    EXPECT_EQ(addr, cpu.immediate());
+}
+
+TEST_F(CpuTest, zeroPage) {
+    cpu.reset();
+    Byte addr = mem.read(cpu.PC);
+    EXPECT_EQ(addr, cpu.zeroPage());
+}
+
+TEST_F(CpuTest, zeroPageX) {
+    cpu.reset();
+    Byte addr = mem.read(cpu.PC) + cpu.X;
+    EXPECT_EQ(addr, cpu.zeroPageX());
+}
+
+TEST_F(CpuTest, zeroPageX_checkOverflow) {
+    cpu.reset();
+    cpu.X = 0xB7;
+    mem.write(cpu.PC, 0xB7);
+    Byte addr = Byte(0xB7 + 0xB7);
+    EXPECT_EQ(addr, cpu.zeroPageX());
+}
+
+TEST_F(CpuTest, zeroPageY) {
+    cpu.reset();
+    Byte addr = mem.read(cpu.PC) + cpu.Y;
+    EXPECT_EQ(addr, cpu.zeroPageY());
+}
+
+TEST_F(CpuTest, zeroPageY_checkOverflow) {
+    cpu.reset();
+    cpu.Y = 0xB7;
+    mem.write(cpu.PC, 0xB7);
+    Byte addr = Byte(0xB7 + 0xB7);
+    EXPECT_EQ(addr, cpu.zeroPageY());
+}
+
+TEST_F(CpuTest, absolute) {
+    cpu.reset();
+    Word addr = mem.read16(cpu.PC);
+    EXPECT_EQ(addr, cpu.absolute());
+}
+
+TEST_F(CpuTest, absoluteX) {
+    cpu.reset();
+    cpu.X = 0x10;
+    Word base = mem.read16(cpu.PC);
+    EXPECT_EQ((Word)(base + cpu.X), cpu.absoluteX());
+}
+
+TEST_F(CpuTest, absoluteY) {
+    cpu.reset();
+    cpu.Y = 0x20;
+    Word base = mem.read16(cpu.PC);
+    EXPECT_EQ((Word)(base + cpu.Y), cpu.absoluteY());
+}
+
+TEST_F(CpuTest, indirectX) {
+    cpu.reset();
+    cpu.X = 0x05;
+    Byte zpAddr = mem.read(cpu.PC);
+    Byte finalZP = zpAddr + cpu.X;
+    Word target = mem.read16(finalZP);
+    EXPECT_EQ(target, cpu.indirectX());
+}
+
+TEST_F(CpuTest, indirectY) {
+    cpu.reset();
+    cpu.Y = 0x08;
+    Byte zpAddr = mem.read(cpu.PC);
+    Word base = mem.read16(zpAddr);
+    EXPECT_EQ((Word)(base + cpu.Y), cpu.indirectY());
+}
+
 TEST_F(CpuTest, testFlagN) {
 
         cpu.reset();
