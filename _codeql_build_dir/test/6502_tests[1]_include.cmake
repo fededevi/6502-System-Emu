@@ -1,0 +1,5 @@
+if(EXISTS "/home/runner/work/6502-System-Emu/6502-System-Emu/_codeql_build_dir/test/6502_tests[1]_tests.cmake")
+  include("/home/runner/work/6502-System-Emu/6502-System-Emu/_codeql_build_dir/test/6502_tests[1]_tests.cmake")
+else()
+  add_test(6502_tests_NOT_BUILT 6502_tests_NOT_BUILT)
+endif()
