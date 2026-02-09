@@ -11,7 +11,6 @@
 
 # Build files
 Makefile*
-!Makefile.test_runner
 *build-*
 
 # Test runner binary
