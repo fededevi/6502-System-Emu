@@ -11,6 +11,7 @@ A comprehensive 6502 CPU emulator implementation with extensive testing capabili
 - Industry-standard functional test programs integrated
 - Hexdump utilities for verification
 - Modern CMake build system
+- **NEW: Compile-time constexpr optimization** - Execute programs at compile-time for zero runtime cost!
 
 ### Prerequisites
 
@@ -97,6 +98,23 @@ After building, the main executable supports command-line arguments for flexible
 - `-pc <address>` - Set program counter (hex, default: from reset vector)
 - `-m <cycles>` - Maximum cycles to execute (default: 100000000)
 - `-h` - Display help message
+
+## Compile-Time Execution (Constexpr Feature)
+
+The emulator includes a groundbreaking **constexpr** feature that allows 6502 programs to be executed at **compile-time** rather than runtime. This creates hyper-optimized executables where the program execution is "baked in" during compilation, resulting in **zero runtime cost**.
+
+```bash
+# Build and run the constexpr example
+./build/6502_constexpr_example
+```
+
+**Benefits:**
+- Program executes during compilation
+- Final memory and CPU state embedded in the binary
+- Zero runtime execution cost (infinitely fast!)
+- Perfect for fixed programs, boot ROMs, and initialization sequences
+
+See [CONSTEXPR_FEATURE.md](CONSTEXPR_FEATURE.md) for detailed documentation and usage examples.
 
 ## Testing
 

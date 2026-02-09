@@ -39,6 +39,17 @@ target_include_directories(6502_emulator PUBLIC
 add_executable(6502_emu src/main.cpp)
 target_link_libraries(6502_emu PRIVATE 6502_emulator)
 
+# Constexpr library for compile-time optimization (header-only)
+add_library(6502_constexpr INTERFACE)
+
+target_include_directories(6502_constexpr INTERFACE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core
+)
+
+# Constexpr example demonstrating compile-time execution
+add_executable(6502_constexpr_example src/constexpr_example.cpp)
+target_link_libraries(6502_constexpr_example PRIVATE 6502_constexpr)
+
 # Enable testing
 enable_testing()
 add_subdirectory(test)
