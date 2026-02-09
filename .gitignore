@@ -28,6 +28,9 @@ CTestTestfile.cmake
 _deps/
 *.cbp
 
+# CodeQL
+_codeql_build_dir/
+
 # IDE files
 *.autosave
 *.user
