@@ -22,11 +22,12 @@ CPU::CPU(Memory *_mem): mem(_mem){
 }
 
 void BRK(CPU * cpu) {
+    cpu->PC++;  // BRK has a dummy operand byte, skip it
     cpu->push(cpu->PC >> 8);
-    cpu->push(cpu->PC);
-    cpu->push(cpu->P);
+    cpu->push(cpu->PC & 0xFF);
+    cpu->push(cpu->P | 0x30);  // B flag and unused flag (bits 4 & 5) are set when pushed
     cpu->PC = cpu->mem->read16(0XFFFE);
-    cpu->setB(true);
+    cpu->setI(true);  // Set interrupt disable flag
 }
 
 // Common helper function for setting N and Z flags
@@ -190,44 +191,44 @@ Word CPU::indirectY() {
 }
 
 void CPU::setN(bool f){
-    int pos = 0;
+    int pos = 7;
     P  = P & ~(1 << pos);
     P |= (f << pos);
 }
 
 void CPU::setV(bool f){
-    int pos = 1;
+    int pos = 6;
     P  = P & ~(1 << pos);
     P |= (f << pos);
 }
 
 void CPU::setB(bool f){
-    int pos = 3;
-    P  = P & ~(1 << pos);
-    P |= (f << pos);
-}
-
-void CPU::setD(bool f){
     int pos = 4;
     P  = P & ~(1 << pos);
     P |= (f << pos);
 }
 
+void CPU::setD(bool f){
+    int pos = 3;
+    P  = P & ~(1 << pos);
+    P |= (f << pos);
+}
+
 void CPU::setI(bool f){
-    int pos = 5;
+    int pos = 2;
     P  = P & ~(1 << pos);
     P |= (f << pos);
 }
 
 void CPU::setZ(bool f){
-    int pos = 6;
+    int pos = 1;
     P  = P & ~(1 << pos);
     P |= (f << pos);
 }
 
 
 void CPU::setC(bool f){
-    int pos = 7;
+    int pos = 0;
     P  = P & ~(1 << pos);
     P |= (f << pos);
 

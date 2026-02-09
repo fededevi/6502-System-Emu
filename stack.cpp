@@ -24,7 +24,7 @@ void PLA(CPU * cpu) {
 // PHP - Push Processor Status (0x08)
 void PHP(CPU * cpu) {
     CYCL
-    cpu->push(cpu->P | 0x10);  // B flag is set when pushed
+    cpu->push(cpu->P | 0x30);  // B flag and unused flag (bits 4 & 5) are set when pushed
     CYCL
 }
 
