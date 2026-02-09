@@ -16,8 +16,7 @@ This repository now includes industry-standard binary test programs for comprehe
 
 ### 2. Test Runner Application
 - **test_runner.cpp** - C++ application to load and execute binary tests
-- **test_runner.pro** - Qt project file (for qmake builds)
-- **Makefile.test_runner** - Standalone Makefile (for systems without qmake)
+- **Makefile.test_runner** - Standalone Makefile for building
 - **build_test_runner.sh** - Automated build script
 
 ### 3. Documentation Updates
@@ -43,18 +42,12 @@ Expected output:
 
 ### Build the Test Runner
 
-#### Option 1: Using the build script (easiest)
+#### Using the build script (recommended)
 ```bash
 ./build_test_runner.sh
 ```
 
-#### Option 2: Using qmake (if available)
-```bash
-qmake6 test_runner.pro  # or just 'qmake' on some systems
-make
-```
-
-#### Option 3: Using the standalone Makefile
+#### Using the standalone Makefile
 ```bash
 make -f Makefile.test_runner
 ```

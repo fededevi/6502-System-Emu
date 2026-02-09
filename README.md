@@ -16,7 +16,7 @@ A comprehensive 6502 CPU emulator implementation with extensive testing capabili
 
 - CMake 3.14 or higher
 - C++17 compatible compiler (GCC, Clang, MSVC)
-- Qt5 (qtbase5-dev) for the test suite
+- Internet connection (for downloading Google Test during build)
 
 ### Build Instructions
 
@@ -61,7 +61,7 @@ cmake --build . --config Release
   - `*.cpp` - Individual instruction implementations
 
 - **Unit Tests:**
-  - `test/` - Qt-based unit test suite
+  - `test/` - Google Test-based unit test suite
   - See `test/README.md` for details
 
 - **Binary Test Programs:**
@@ -111,11 +111,10 @@ Build and run the test runner:
 ./test_runner
 ```
 
-Or manually with qmake (if available):
+Or manually using the standalone Makefile:
 
 ```bash
-qmake6 test_runner.pro
-make
+make -f Makefile.test_runner
 ./test_runner
 ```
 
@@ -130,28 +129,9 @@ cd test_programs
 
 Ensure test binaries are loaded correctly using the provided hexdump utilities.
 
-## Legacy Build System
-
-The project previously used Qt's `.pro` files for building. These files are still present for backwards compatibility:
-
-### Main Emulator (Legacy)
-
-```bash
-qmake6 6502.pro
-make
-```
-
-### Unit Tests (Legacy)
-
-```bash
-cd test
-qmake6 test.pro
-make
-./test
-```
-
 ## Resources
 
 - [Klaus Dormann's 6502 Test Suite](https://github.com/Klaus2m5/6502_65C02_functional_tests)
+- [Google Test Documentation](https://google.github.io/googletest/)
 - [6502.org Documentation](http://www.6502.org/)
 - [Visual 6502](http://visual6502.org/)

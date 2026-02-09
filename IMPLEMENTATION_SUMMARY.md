@@ -21,9 +21,8 @@ Successfully integrated Klaus Dormann's industry-standard 6502 functional test s
 Created a complete C++ application to execute binary test programs:
 
 - **test_runner.cpp** - Main application with loop detection and detailed reporting
-- **test_runner.pro** - Qt project file (for qmake builds)
-- **Makefile.test_runner** - Standalone Makefile (for environments without qmake)
-- **build_test_runner.sh** - Automated build script with fallback options
+- **Makefile.test_runner** - Standalone Makefile
+- **build_test_runner.sh** - Automated build script
 
 ### 3. Memory System Improvements
 Enhanced the Memory class for better encapsulation:
@@ -69,10 +68,10 @@ cd test_programs
 
 ### Build Test Runner
 ```bash
-# Option 1: Automated
+# Using build script
 ./build_test_runner.sh
 
-# Option 2: Manual
+# Or manual build
 make -f Makefile.test_runner
 ```
 
@@ -115,7 +114,6 @@ These serve multiple purposes:
 - test_programs/README.md
 - test_programs/verify_tests.sh
 - test_runner.cpp
-- test_runner.pro
 - Makefile.test_runner
 - build_test_runner.sh
 - TESTING_GUIDE.md
