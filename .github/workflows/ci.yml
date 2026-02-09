@@ -45,7 +45,6 @@ jobs:
           exit 0
         else
           echo "✗ Klaus test FAILED"
-          echo "$output"
           exit 1
         fi
     
