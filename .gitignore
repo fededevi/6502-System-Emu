@@ -36,3 +36,5 @@ _codeql_build_dir/
 *.user.*
 compile_commands.json
 *creator.user*
+
+.cache/
