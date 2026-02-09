@@ -21,8 +21,7 @@ Successfully integrated Klaus Dormann's industry-standard 6502 functional test s
 Created a complete C++ application to execute binary test programs:
 
 - **test_runner.cpp** - Main application with loop detection and detailed reporting
-- **Makefile.test_runner** - Standalone Makefile
-- **build_test_runner.sh** - Automated build script
+- Integrated into CMake build system as executable and CTest target
 
 ### 3. Memory System Improvements
 Enhanced the Memory class for better encapsulation:
@@ -60,24 +59,27 @@ Current test status: **FAILS at address 0x674**
 
 ## How to Use
 
+### Build and Test
+
+```bash
+# Build everything
+mkdir build
+cd build
+cmake ..
+cmake --build .
+
+# Run all tests
+ctest --output-on-failure
+
+# Or run individual tests
+./test_runner  # Functional test
+./test/6502_tests  # Unit tests
+```
+
 ### Verify Test Files
 ```bash
 cd test_programs
 ./verify_tests.sh
-```
-
-### Build Test Runner
-```bash
-# Using build script
-./build_test_runner.sh
-
-# Or manual build
-make -f Makefile.test_runner
-```
-
-### Run Tests
-```bash
-./test_runner
 ```
 
 ### Debug Failures
@@ -114,17 +116,22 @@ These serve multiple purposes:
 - test_programs/README.md
 - test_programs/verify_tests.sh
 - test_runner.cpp
-- Makefile.test_runner
-- build_test_runner.sh
 - TESTING_GUIDE.md
 - debug_test_failure.sh
 
 ### Modified Files
-- README.md (added test program documentation)
+- README.md (updated test documentation to use CMake)
+- CMakeLists.txt (integrated test_runner and verify_tests.sh as CTest targets)
+- TESTING_GUIDE.md (updated to use CMake/CTest commands)
+- IMPLEMENTATION_SUMMARY.md (updated build instructions)
 - .gitignore (allow Makefile.test_runner, exclude test_runner binary)
 - memory.h (added writeBlock method)
 - memory.cpp (implemented writeBlock)
 - transfer.cpp (added SetNZ forward declaration)
+
+### Removed Files
+- build_test_runner.sh (replaced by CMake integration)
+- Makefile.test_runner (replaced by CMake integration)
 
 ## Compliance with Requirements
 

@@ -37,6 +37,22 @@ target_include_directories(6502_emulator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 add_executable(6502_emu main.cpp)
 target_link_libraries(6502_emu PRIVATE 6502_emulator)
 
+# Test runner for functional binary tests
+add_executable(test_runner test_runner.cpp)
+target_link_libraries(test_runner PRIVATE 6502_emulator)
+
 # Enable testing
 enable_testing()
 add_subdirectory(test)
+
+# Add functional test as a CTest target
+add_test(NAME FunctionalTest
+    COMMAND test_runner
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+# Add test program verification as a CTest target
+add_test(NAME VerifyTestPrograms
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/test_programs/verify_tests.sh
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test_programs
+)

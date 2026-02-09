@@ -104,25 +104,17 @@ The `test_programs/` directory contains comprehensive binary test programs:
 - **Hexdump files** - For verification and debugging
 - **Listing files** - Assembly source with comments
 
-Build and run the test runner:
+Run all tests (including functional tests):
 
 ```bash
-./build_test_runner.sh
-./test_runner
+cd build
+ctest --output-on-failure
 ```
 
-Or manually using the standalone Makefile:
+Or run the functional test directly:
 
 ```bash
-make -f Makefile.test_runner
-./test_runner
-```
-
-To verify test program integrity:
-
-```bash
-cd test_programs
-./verify_tests.sh
+./build/test_runner
 ```
 
 ### 3. Hexdump Verification

@@ -16,8 +16,7 @@ This repository now includes industry-standard binary test programs for comprehe
 
 ### 2. Test Runner Application
 - **test_runner.cpp** - C++ application to load and execute binary tests
-- **Makefile.test_runner** - Standalone Makefile for building
-- **build_test_runner.sh** - Automated build script
+- Integrated into CMake build system
 
 ### 3. Documentation Updates
 - Updated main **README.md** with test program information
@@ -25,37 +24,45 @@ This repository now includes industry-standard binary test programs for comprehe
 
 ## Quick Start
 
-### Verify Test Files
+### Build Everything
 
+```bash
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
+
+### Run All Tests
+
+```bash
+cd build
+ctest --output-on-failure
+```
+
+This will run:
+- Unit tests (Google Test suite)
+- Functional test (Klaus Dormann's test)
+- Test program verification
+
+### Run Individual Tests
+
+#### Unit Tests Only
+```bash
+cd build
+./test/6502_tests
+```
+
+#### Functional Test Only
+```bash
+cd build
+./test_runner
+```
+
+#### Verify Test Files Only
 ```bash
 cd test_programs
 ./verify_tests.sh
-```
-
-Expected output:
-```
-✓ Binary size correct: 65536 bytes (64KB)
-✓ Hexdump file exists: 6502_functional_test.hex
-✓ XXD hexdump file exists: 6502_functional_test.xxd
-✓ Listing file exists: 6502_functional_test.lst
-```
-
-### Build the Test Runner
-
-#### Using the build script (recommended)
-```bash
-./build_test_runner.sh
-```
-
-#### Using the standalone Makefile
-```bash
-make -f Makefile.test_runner
-```
-
-### Run the Tests
-
-```bash
-./test_runner
 ```
 
 ## Understanding Test Results
@@ -136,13 +143,16 @@ Klaus Dormann's functional test validates:
 
 ## Integration with CI/CD
 
-The test runner can be integrated into CI/CD pipelines:
+The tests are integrated into CMake/CTest and can be run in CI/CD pipelines:
 
 ```bash
 #!/bin/bash
 # Build and test
-make -f Makefile.test_runner
-./test_runner
+mkdir build
+cd build
+cmake ..
+cmake --build .
+ctest --output-on-failure
 if [ $? -eq 0 ]; then
     echo "All tests passed!"
     exit 0
