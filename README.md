@@ -55,10 +55,14 @@ cmake --build . --config Release
 
 ## Project Structure
 
-- **Core Emulator:**
-  - `cpu.h`, `cpu.cpp` - CPU implementation
-  - `memory.h`, `memory.cpp` - Memory system
-  - `*.cpp` - Individual instruction implementations
+- **Source Code:**
+  - `src/core/` - Core emulator components
+    - `cpu.h`, `cpu.cpp` - CPU implementation
+    - `memory.h`, `memory.cpp` - Memory system
+    - `types.h` - Type definitions
+  - `src/instructions/` - Individual instruction implementations
+    - `load.cpp`, `store.cpp`, `addcarry.cpp`, etc.
+  - `src/main.cpp` - Main executable with command-line interface
 
 - **Unit Tests:**
   - `test/` - Google Test-based unit test suite
@@ -71,11 +75,28 @@ cmake --build . --config Release
 
 ## Running the Emulator
 
-After building, run the emulator with:
+After building, the main executable supports command-line arguments for flexible execution:
 
 ```bash
-./6502_emu
+# Show help
+./build/6502_emu -h
+
+# Run with default reset vector
+./build/6502_emu
+
+# Load and run a binary program
+./build/6502_emu -f program.bin -a 8000 -pc 8000
+
+# Load program with custom cycle limit
+./build/6502_emu -f program.bin -a 0000 -m 1000000
 ```
+
+**Command-line Options:**
+- `-f <file>` - Load binary program from file
+- `-a <address>` - Address to load program at (hex, default: 0x0000)
+- `-pc <address>` - Set program counter (hex, default: from reset vector)
+- `-m <cycles>` - Maximum cycles to execute (default: 100000000)
+- `-h` - Display help message
 
 ## Testing
 
@@ -111,10 +132,10 @@ cd build
 ctest --output-on-failure
 ```
 
-Or run the functional test directly:
+Or run functional tests using the main executable:
 
 ```bash
-./build/test_runner
+./build/6502_emu -f test_programs/6502_functional_test.bin -a 0000 -pc 0400
 ```
 
 ### 3. Hexdump Verification

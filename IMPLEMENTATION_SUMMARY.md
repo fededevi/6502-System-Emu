@@ -17,11 +17,14 @@ Successfully integrated Klaus Dormann's industry-standard 6502 functional test s
 - **README.md** - Comprehensive documentation
 - **verify_tests.sh** - Automated verification script
 
-### 2. Test Runner Application
-Created a complete C++ application to execute binary test programs:
+### 2. Main Executable Enhancement
+Enhanced the main executable with command-line interface for flexible execution:
 
-- **test_runner.cpp** - Main application with loop detection and detailed reporting
-- Integrated into CMake build system as executable and CTest target
+- **src/main.cpp** - Supports loading binary programs with configurable parameters
+- Command-line options for program loading, memory addressing, and cycle limits
+- Infinite loop detection with automatic termination
+- Detailed execution statistics (cycles, final PC, elapsed time)
+- Integrated into CMake build system
 
 ### 3. Memory System Improvements
 Enhanced the Memory class for better encapsulation:
@@ -72,7 +75,7 @@ cmake --build .
 ctest --output-on-failure
 
 # Or run individual tests
-./test_runner  # Functional test
+./6502_emu -f ../test_programs/6502_functional_test.bin -a 0000 -pc 0400  # Functional test
 ./test/6502_tests  # Unit tests
 ```
 
@@ -115,23 +118,22 @@ These serve multiple purposes:
 - test_programs/6502_functional_test.xxd
 - test_programs/README.md
 - test_programs/verify_tests.sh
-- test_runner.cpp
-- TESTING_GUIDE.md
 - debug_test_failure.sh
+- src/ directory structure
+  - src/core/ (cpu.h, cpu.cpp, memory.h, memory.cpp, types.h)
+  - src/instructions/ (all instruction implementation files)
+  - src/main.cpp (enhanced with CLI)
 
 ### Modified Files
-- README.md (updated test documentation to use CMake)
-- CMakeLists.txt (integrated test_runner and verify_tests.sh as CTest targets)
-- TESTING_GUIDE.md (updated to use CMake/CTest commands)
-- IMPLEMENTATION_SUMMARY.md (updated build instructions)
-- .gitignore (updated to remove Makefile.test_runner exception)
+- README.md (updated for new directory structure and main executable CLI)
+- CMakeLists.txt (removed test_runner, updated paths for src/ structure)
+- main.cpp (enhanced with command-line interface for loading programs)
 - memory.h (added writeBlock method)
 - memory.cpp (implemented writeBlock)
-- transfer.cpp (added SetNZ forward declaration)
 
 ### Removed Files
-- build_test_runner.sh (replaced by CMake integration)
-- Makefile.test_runner (replaced by CMake integration)
+- test_runner.cpp (functionality integrated into main.cpp)
+- test_instructions.cpp (tests should be in test/ directory)
 
 ## Compliance with Requirements
 
@@ -154,7 +156,9 @@ Il repository ora include:
    - Verificano l'integrità del binario
 
 ✅ **Test Runner**
-   - Applicazione C++ per eseguire i test
+   - Integrated into main executable (6502_emu)
+   - Command-line interface for loading and running programs
+   - Supports custom load addresses and program counters
    - Rileva automaticamente successo/fallimento
    - Mostra stato dettagliato della CPU
 

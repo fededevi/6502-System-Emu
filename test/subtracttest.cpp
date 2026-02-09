@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "../cpu.h"
-#include "../memory.h"
+#include "cpu.h"
+#include "memory.h"
 
 class SubtractTest : public ::testing::Test {
 protected:

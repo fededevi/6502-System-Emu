@@ -86,8 +86,8 @@ Example test structure:
 
 ```cpp
 #include <gtest/gtest.h>
-#include "../cpu.h"
-#include "../memory.h"
+#include "cpu.h"
+#include "memory.h"
 
 class MyTest : public ::testing::Test {
 protected:
@@ -119,8 +119,8 @@ Example:
 ```cpp
 // mynewtest.cpp
 #include <gtest/gtest.h>
-#include "../cpu.h"
-#include "../memory.h"
+#include "cpu.h"
+#include "memory.h"
 
 class MyNewTest : public ::testing::Test {
 protected:

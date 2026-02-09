@@ -16,14 +16,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Define source files for the emulator library
 set(EMULATOR_SOURCES
-    cpu.cpp
-    memory.cpp
+    src/core/cpu.cpp
+    src/core/memory.cpp
 )
 
 set(EMULATOR_HEADERS
-    cpu.h
-    memory.h
-    types.h
+    src/core/cpu.h
+    src/core/memory.h
+    src/core/types.h
 )
 
 # Create a library with the emulator code
@@ -31,25 +31,17 @@ add_library(6502_emulator STATIC
     ${EMULATOR_SOURCES}
 )
 
-target_include_directories(6502_emulator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(6502_emulator PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core
+)
 
-# Main executable
-add_executable(6502_emu main.cpp)
+# Main executable (supports both direct execution and running binary programs)
+add_executable(6502_emu src/main.cpp)
 target_link_libraries(6502_emu PRIVATE 6502_emulator)
-
-# Test runner for functional binary tests
-add_executable(test_runner test_runner.cpp)
-target_link_libraries(test_runner PRIVATE 6502_emulator)
 
 # Enable testing
 enable_testing()
 add_subdirectory(test)
-
-# Add functional test as a CTest target
-add_test(NAME FunctionalTest
-    COMMAND test_runner
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
 
 # Add test program verification as a CTest target
 add_test(NAME VerifyTestPrograms

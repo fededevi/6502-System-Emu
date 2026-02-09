@@ -3,19 +3,19 @@
 // Forward declaration of common helper function
 void SetNZ(CPU * cpu, Byte reg);
 
-#include "load.cpp"
-#include "store.cpp"
-#include "addcarry.cpp"
-#include "subtract.cpp"
-#include "transfer.cpp"
-#include "stack.cpp"
-#include "flags.cpp"
-#include "incdec.cpp"
-#include "logical.cpp"
-#include "compare.cpp"
-#include "branch.cpp"
-#include "shifts.cpp"
-#include "misc.cpp"
+#include "../instructions/load.cpp"
+#include "../instructions/store.cpp"
+#include "../instructions/addcarry.cpp"
+#include "../instructions/subtract.cpp"
+#include "../instructions/transfer.cpp"
+#include "../instructions/stack.cpp"
+#include "../instructions/flags.cpp"
+#include "../instructions/incdec.cpp"
+#include "../instructions/logical.cpp"
+#include "../instructions/compare.cpp"
+#include "../instructions/branch.cpp"
+#include "../instructions/shifts.cpp"
+#include "../instructions/misc.cpp"
 
 CPU::CPU(Memory *_mem): mem(_mem){
 

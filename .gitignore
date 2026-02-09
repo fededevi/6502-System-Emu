@@ -13,9 +13,6 @@
 Makefile*
 *build-*
 
-# Test runner binary
-test_runner
-
 # CMake
 build/
 cmake-build-*/
