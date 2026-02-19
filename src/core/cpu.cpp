@@ -105,15 +105,6 @@ uint8_t CPU::pop() {
     SP++;
 }
 
-void CPU::pushPC() {
-
-}
-
-uint8_t CPU::popPC() {
-
-}
-
-
 Word CPU::immediate() {
     return PC++;
 }

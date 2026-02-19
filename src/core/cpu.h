@@ -29,9 +29,6 @@ public:
     void push(Byte);
     Byte pop();
 
-    void pushPC();
-    Byte popPC();
-
     Word immediate();
     Byte zeroPage();
     Byte zeroPageX();
@@ -58,5 +55,5 @@ public:
     Byte C() { return (P & (1 << 0)) > 0; };
 
     // Cycles
-    __int128 cycles = 0;
+    long long cycles = 0;
 };
