@@ -1,0 +1,61 @@
+name: PGO Build & Verify
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+
+jobs:
+  pgo:
+    name: PGO Workflow (Generate -> Train -> Use)
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install deps
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake
+
+    - name: Configure instrumented build (PGO generate)
+      run: |
+        mkdir -p build-pgo
+        cd build-pgo
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DPGO_MODE=GENERATE
+
+    - name: Build instrumented binary
+      run: |
+        cmake --build build-pgo --config Release -j $(nproc)
+
+    - name: Run training workload (functional test)
+      run: |
+        cd build-pgo
+        ./6502_emu -f ../test_programs/6502_functional_test.bin -a 0x0000 -pc 0x0400 -m 200000000
+
+    - name: Re-configure build for PGO use
+      run: |
+        cd build-pgo
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DPGO_MODE=USE
+
+    - name: Build optimized binary (PGO use)
+      run: |
+        cmake --build build-pgo --config Release -j $(nproc)
+
+    - name: Run optimized binary and verify
+      run: |
+        cd build-pgo
+        output=$(./6502_emu -f ../test_programs/6502_functional_test.bin -a 0x0000 -pc 0x0400 -m 200000000 2>&1)
+        echo "$output"
+        if echo "$output" | grep -q "Infinite loop detected at PC=0x3469"; then
+          echo "PGO run OK"
+          exit 0
+        else
+          echo "PGO run failed to reach expected halt PC"
+          exit 1
+        fi
+
+    - name: Report
+      if: success()
+      run: echo "PGO workflow completed successfully"

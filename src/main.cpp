@@ -1,9 +1,8 @@
-#include "memory.h"
 #include "cpu.h"
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <string>
+#include <vector>
 #include <cstdlib>
 #include <chrono>
 
