@@ -39,7 +39,6 @@ void SetNZ(CPU * cpu, Byte reg) {
 
 #define re mem->read
 #define wr mem->write
-#define CYCL cycl()
 
 //Instructions
 void (*functptr[256])(CPU *) = {
@@ -71,17 +70,17 @@ void CPU::reset()
     P = 0X0;
 
     SP = 0X0;
-    CYCL;
-    CYCL;
-    CYCL;
+    cycl();
+    cycl();
+    cycl();
     SP--;
-    CYCL;
+    cycl();
     SP--;
-    CYCL;
+    cycl();
     SP--;
-    CYCL;
+    cycl();
     PC = mem->read16(0XFFFC);
-    CYCL;
+    cycl();
 
 }
 
@@ -109,74 +108,74 @@ Word CPU::immediate() {
 }
 
 Byte CPU::zeroPage() {
-    CYCL;
+    cycl();
     addr8 = re(PC++);
     return addr8;
 }
 
 Byte CPU::zeroPageX() {
-    CYCL;
+    cycl();
     addr16 = re(PC++);
-    CYCL;
+    cycl();
     addr16 += X;
     return addr16;
 }
 
 Byte CPU::zeroPageY() {
-    CYCL;
+    cycl();
     addr16 = re(PC++);
-    CYCL;
+    cycl();
     addr16 += Y;
     return addr16;
 }
 
 Word CPU::absolute() {
     Word addr = mem->read16(PC);
-    CYCL; PC++;
-    CYCL; PC++;
+    cycl(); PC++;
+    cycl(); PC++;
     return addr;
 }
 
 Word CPU::absoluteX() {
-    CYCL;
+    cycl();
     addr16 = re(PC++) + X;
-    if (addr16 > 0xFF) CYCL;
-    CYCL;
+    if (addr16 > 0xFF) cycl();
+    cycl();
     addr16 += re(PC++) << 8;
     return addr16;
 }
 
 Word CPU::absoluteY() {
-    CYCL;
+    cycl();
     addr16 = re(PC++) + Y;
-    if (addr16 > 0xFF) CYCL;
-    CYCL;
+    if (addr16 > 0xFF) cycl();
+    cycl();
     addr16 += re(PC++) << 8;
     return addr16;
 }
 
 Word CPU::indirectX() {
-    CYCL;
+    cycl();
     addr8 = re(PC++);
-    CYCL;
+    cycl();
     addr8 += X;
-    CYCL;
+    cycl();
     addr16 = re(addr8);
-    CYCL;
+    cycl();
     addr16 += re(addr8+1) << 8;
     return addr16;
 }
 
 Word CPU::indirectY() {
-    CYCL;
+    cycl();
     addr8 = re(PC++);
-    CYCL;
+    cycl();
     addr16 = re(addr8);
-    CYCL;
+    cycl();
     addr16 += re(addr8+1) << 8;
-    CYCL;
+    cycl();
     addr16 += Y;
-    if (addr16 > 0xFF) CYCL;
+    if (addr16 > 0xFF) cycl();
     return addr16;
 }
 

@@ -2,20 +2,20 @@
 
 #define CYCL cpu->cycl();
 
-Word binarySubtract(CPU * cpu, Word addr) {
+Word binarySubtract(CPU * cpu, Byte memValue) {
     // Perform binary subtraction: A - M - (1 - C)
     // Note: On 6502, carry flag acts as "NOT borrow" for subtraction
-    return cpu->A - cpu->mem->read(addr) - (cpu->C() ? 0 : 1);
+    return cpu->A - memValue - (cpu->C() ? 0 : 1);
 }
 
-Word decimalSubtract(CPU * cpu, Word addr) {
+Word decimalSubtract(CPU * cpu, Byte memValue) {
     // BCD (Binary Coded Decimal) subtraction
     // Each nibble represents a decimal digit (0-9)
     Byte a = cpu->A;
-    Byte b = cpu->mem->read(addr);
+    Byte b = memValue;
     Byte borrow = cpu->C() ? 0 : 1;  // On 6502, carry flag acts as "NOT borrow"
     
-    // Subtract low nibbles (ones place)
+    // Subtract low nibble (ones place)
     int lowNibble = (a & 0x0F) - (b & 0x0F) - borrow;
     int lowBorrow = 0;
     if (lowNibble < 0) {
@@ -23,7 +23,7 @@ Word decimalSubtract(CPU * cpu, Word addr) {
         lowBorrow = 1;
     }
     
-    // Subtract high nibbles (tens place) with borrow from low nibble
+    // Subtract high nibble (tens place) with borrow from low nibble
     int highNibble = (a >> 4) - (b >> 4) - lowBorrow;
     int highBorrow = 0;
     if (highNibble < 0) {
@@ -40,7 +40,7 @@ Word decimalSubtract(CPU * cpu, Word addr) {
     }
     
     return result;
-}
+} 
 
 void SBCFlags(CPU * cpu, Word binary, Word decimal, Byte memValue) {
     Byte result = cpu->D() ? (decimal & 0xFF) : (binary & 0xFF);
@@ -65,72 +65,80 @@ void SBCFlags(CPU * cpu, Word binary, Word decimal, Byte memValue) {
 // SBC - Subtract with Carry
 void SBCIX(CPU * cpu) {
     Word addr = cpu->indirectX();
+    CYCL
     Byte memValue = cpu->mem->read(addr);
-    Word binary = binarySubtract(cpu, addr);
-    Word decimal = decimalSubtract(cpu, addr);
+    Word binary = binarySubtract(cpu, memValue);
+    Word decimal = decimalSubtract(cpu, memValue);
     SBCFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void SBCZP(CPU * cpu) {
     Word addr = cpu->zeroPage();
+    CYCL
     Byte memValue = cpu->mem->read(addr);
-    Word binary = binarySubtract(cpu, addr);
-    Word decimal = decimalSubtract(cpu, addr);
+    Word binary = binarySubtract(cpu, memValue);
+    Word decimal = decimalSubtract(cpu, memValue);
     SBCFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void SBCI(CPU * cpu) {
     Word addr = cpu->immediate();
+    CYCL
     Byte memValue = cpu->mem->read(addr);
-    Word binary = binarySubtract(cpu, addr);
-    Word decimal = decimalSubtract(cpu, addr);
+    Word binary = binarySubtract(cpu, memValue);
+    Word decimal = decimalSubtract(cpu, memValue);
     SBCFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void SBCA(CPU * cpu) {
     Word addr = cpu->absolute();
+    CYCL
     Byte memValue = cpu->mem->read(addr);
-    Word binary = binarySubtract(cpu, addr);
-    Word decimal = decimalSubtract(cpu, addr);
+    Word binary = binarySubtract(cpu, memValue);
+    Word decimal = decimalSubtract(cpu, memValue);
     SBCFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void SBCIY(CPU * cpu) {
     Word addr = cpu->indirectY();
+    CYCL
     Byte memValue = cpu->mem->read(addr);
-    Word binary = binarySubtract(cpu, addr);
-    Word decimal = decimalSubtract(cpu, addr);
+    Word binary = binarySubtract(cpu, memValue);
+    Word decimal = decimalSubtract(cpu, memValue);
     SBCFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void SBCZPX(CPU * cpu) {
     Word addr = cpu->zeroPageX();
+    CYCL
     Byte memValue = cpu->mem->read(addr);
-    Word binary = binarySubtract(cpu, addr);
-    Word decimal = decimalSubtract(cpu, addr);
+    Word binary = binarySubtract(cpu, memValue);
+    Word decimal = decimalSubtract(cpu, memValue);
     SBCFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void SBCAY(CPU * cpu) {
     Word addr = cpu->absoluteY();
+    CYCL
     Byte memValue = cpu->mem->read(addr);
-    Word binary = binarySubtract(cpu, addr);
-    Word decimal = decimalSubtract(cpu, addr);
+    Word binary = binarySubtract(cpu, memValue);
+    Word decimal = decimalSubtract(cpu, memValue);
     SBCFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
 
 void SBCAX(CPU * cpu) {
     Word addr = cpu->absoluteX();
+    CYCL
     Byte memValue = cpu->mem->read(addr);
-    Word binary = binarySubtract(cpu, addr);
-    Word decimal = decimalSubtract(cpu, addr);
+    Word binary = binarySubtract(cpu, memValue);
+    Word decimal = decimalSubtract(cpu, memValue);
     SBCFlags(cpu, binary, decimal, memValue);
     cpu->A = cpu->D() ? decimal : binary & 0xFF;
 }
