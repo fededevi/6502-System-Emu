@@ -91,9 +91,8 @@ void CPU::execute()
     functptr[instruction](this);
 }
 
-void CPU::cycl() {
-    cycles++;
-}
+// cycl() made inline in CPU header for better performance (hot-path inlining).
+// Original out-of-line definition removed.
 
 void CPU::push(uint8_t v) {
     mem->write(0x100+SP, v);

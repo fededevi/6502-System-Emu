@@ -25,7 +25,7 @@ public:
 
     Byte P;
 
-    void cycl();
+    inline void cycl() { ++cycles; }
     void push(Byte);
     Byte pop();
 

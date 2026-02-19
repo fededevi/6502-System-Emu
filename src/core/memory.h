@@ -13,8 +13,8 @@ public:
 
 public:
     Byte mem[MEMORY_SIZE];
-    Byte read( Word addr) const;
-    Word read16( Word addr) const;
-    void write( Word addr, Byte value );
-    void writeBlock( Word startAddr, const Byte* data, size_t length );
+    inline Byte read(Word addr) const { return mem[addr]; }
+    inline Word read16(Word addr) const { Byte low = mem[addr]; Byte high = mem[(addr + 1) & 0xFFFF]; return static_cast<Word>((high << 8) | low); }
+    inline void write(Word addr, Byte value) { mem[addr] = value; }
+    inline void writeBlock(Word startAddr, const Byte* data, size_t length) { for (size_t i = 0; i < length && (startAddr + i) < MEMORY_SIZE; ++i) mem[startAddr + i] = data[i]; }
 };
